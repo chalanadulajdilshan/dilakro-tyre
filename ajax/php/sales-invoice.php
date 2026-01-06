@@ -335,7 +335,8 @@ if (isset($_POST['create'])) {
             $SALES_ITEM->item_name = $item['code'] . '|' . $item['name'] . '|ARN:' . $arn_id . '|DEPT:' . $correctDepartmentId;
             $SALES_ITEM->list_price = $item['price']; // Save the original list price
             $SALES_ITEM->price = $item['selling_price']; // Save the actual selling price (price after discount per unit)
-            $SALES_ITEM->cost = $item['cost']; // Set the cost field
+            // Services (SV) should not have cost
+            $SALES_ITEM->cost = (substr($item['code'], 0, 2) === 'SV') ? 0 : $item['cost'];
             $SALES_ITEM->discount = $item_discount_amount;
             $SALES_ITEM->total = ($item['selling_price'] * $qty_for_total);
             $SALES_ITEM->vehicle_no = isset($item['vehicle_no']) ? $item['vehicle_no'] : '';
