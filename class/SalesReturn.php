@@ -43,21 +43,44 @@ class SalesReturn
 
     public function create()
     {
+        $db = Database::getInstance();
+        
+        // Escape all values to prevent SQL injection and handle special characters
+        $return_no = $db->escapeString($this->return_no);
+        $return_date = $db->escapeString($this->return_date);
+        $invoice_no = $db->escapeString($this->invoice_no);
+        $invoice_id = (int)$this->invoice_id;
+        $customer_id = (int)$this->customer_id;
+        $total_amount = $db->escapeString($this->total_amount);
+        $return_reason = $db->escapeString($this->return_reason);
+        $remarks = $db->escapeString($this->remarks);
+        $is_damaged = (int)$this->is_damaged;
+        $created_by = (int)$this->created_by;
+        
         $query = "INSERT INTO `sales_return` (
             `return_no`, `return_date`, `invoice_no`, `invoice_id`, `customer_id`, `total_amount`, `return_reason`, `remarks`, `is_damaged`, `created_by`, `created_at`, `updated_at`
         ) VALUES (
-            '$this->return_no', '$this->return_date', '$this->invoice_no', '$this->invoice_id', '$this->customer_id', '$this->total_amount', '$this->return_reason', '$this->remarks', '$this->is_damaged', '$this->created_by', NOW(), NOW()
+            '$return_no', '$return_date', '$invoice_no', '$invoice_id', '$customer_id', '$total_amount', '$return_reason', '$remarks', '$is_damaged', '$created_by', NOW(), NOW()
         )";
 
-        $db = Database::getInstance();
-        $result = $db->readQuery($query);
+        error_log("Sales Return Create Query: " . $query);
+        
+        $result = mysqli_query($db->DB_CON, $query);
+        
+        if (!$result) {
+            error_log("Sales Return Create Error: " . mysqli_error($db->DB_CON));
+            return false;
+        }
 
         if ($result) {
+            $insert_id = mysqli_insert_id($db->DB_CON);
+            error_log("Sales Return Created with ID: " . $insert_id);
+            
             // Update the invoice's is_return flag
             $invoice = new SalesInvoice($this->invoice_id);
             $invoice->updateIsReturnFlag();
             
-            return mysqli_insert_id($db->DB_CON);
+            return $insert_id;
         } else {
             return false;
         }

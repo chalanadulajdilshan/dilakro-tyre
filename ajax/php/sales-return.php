@@ -170,9 +170,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'save_sales_return') {
     $SALES_RETURN->is_damaged = isset($return_data['is_damaged']) ? (int)$return_data['is_damaged'] : 0;
     $SALES_RETURN->created_by = $_SESSION['user']['id'] ?? 1;
 
+    error_log("Creating sales return with data: " . print_r([
+        'return_no' => $return_no,
+        'return_date' => $return_data['return_date'],
+        'invoice_no' => $return_data['invoice_no'],
+        'invoice_id' => $invoice['id'],
+        'customer_id' => $return_data['customer_id'],
+        'total_amount' => $return_data['total_amount']
+    ], true));
+    
     $return_id = $SALES_RETURN->create();
 
     if ($return_id) {
+        error_log("Sales return created successfully with ID: " . $return_id);
+        
         // Save return items
         foreach ($return_items as $item) {
             $RETURN_ITEM = new SalesReturnItem();
@@ -184,6 +195,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'save_sales_return') {
             $RETURN_ITEM->tax = $item['tax'];
             $RETURN_ITEM->net_amount = $item['net_amount'];
             $RETURN_ITEM->remarks = $item['remarks'] ?? '';
+            
+            error_log("Creating return item: " . print_r($item, true));
             
             $item_result = $RETURN_ITEM->create();
             error_log("Item created for return $return_id: " . $item_result);
