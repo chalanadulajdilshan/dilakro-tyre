@@ -37,17 +37,37 @@ class SalesReturnItem
 
     public function create()
     {
+        $db = Database::getInstance();
+        
+        // Escape all values to prevent SQL injection and handle special characters
+        $return_id = (int)$this->return_id;
+        $item_id = $db->escapeString($this->item_id);
+        $quantity = $db->escapeString($this->quantity);
+        $unit_price = $db->escapeString($this->unit_price);
+        $discount = $db->escapeString($this->discount);
+        $tax = $db->escapeString($this->tax);
+        $net_amount = $db->escapeString($this->net_amount);
+        $remarks = $db->escapeString($this->remarks);
+        
         $query = "INSERT INTO `sales_return_items` (
             `return_id`, `item_id`, `quantity`, `unit_price`, `discount`, `tax`, `net_amount`, `remarks`, `created_at`
         ) VALUES (
-            '$this->return_id', '$this->item_id', '$this->quantity', '$this->unit_price', '$this->discount', '$this->tax', '$this->net_amount', '$this->remarks', NOW()
+            '$return_id', '$item_id', '$quantity', '$unit_price', '$discount', '$tax', '$net_amount', '$remarks', NOW()
         )";
 
-        $db = Database::getInstance();
-        $result = $db->readQuery($query);
+        error_log("Sales Return Item Create Query: " . $query);
+        
+        $result = mysqli_query($db->DB_CON, $query);
+        
+        if (!$result) {
+            error_log("Sales Return Item Create Error: " . mysqli_error($db->DB_CON));
+            return false;
+        }
 
         if ($result) {
-            return mysqli_insert_id($db->DB_CON);
+            $insert_id = mysqli_insert_id($db->DB_CON);
+            error_log("Sales Return Item Created with ID: " . $insert_id);
+            return $insert_id;
         } else {
             return false;
         }
