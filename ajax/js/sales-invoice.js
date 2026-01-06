@@ -461,8 +461,19 @@ jQuery(document).ready(function () {
         parseFloat($("#serviceSellingPrice").val()) || 0;
       const discount = parseFloat($("#itemDiscount").val()) || 0;
 
+      // Check if a service (SV) is also selected - only then combine prices
+      const selectedServiceId = $("#service").val();
+      const hasServiceSelected = selectedServiceId && selectedServiceId != "0";
+
       // Calculate combined price before discount
-      const combinedPriceBeforeDiscount = listPrice + serviceSellingPrice;
+      // Only add listPrice if a service (SV) is also selected, otherwise use serviceSellingPrice alone
+      let combinedPriceBeforeDiscount;
+      if (hasServiceSelected) {
+        combinedPriceBeforeDiscount = listPrice + serviceSellingPrice;
+      } else {
+        // Service item only (SI) - use serviceSellingPrice directly without adding listPrice
+        combinedPriceBeforeDiscount = serviceSellingPrice;
+      }
 
       // Apply discount to the combined total (discount is a fixed value)
       let discountAmount = discount;
@@ -2014,7 +2025,9 @@ jQuery(document).ready(function () {
       // --- ROW 2: Service Item (SI/) ---
       const serviceItemCode = "SI/" + selectedServiceItemId.toString().padStart(4, "0");
       const serviceItemName = $("#service_items option:selected").text().trim();
-      const serviceItemTotal = serviceSellingPrice * serviceQty;
+      // Use unit price for calculations, not the combined/multiplied serviceSellingPrice
+      const serviceItemUnitPrice = unitServiceSellingPrice;
+      const serviceItemTotal = serviceItemUnitPrice * serviceQty;
       const serviceItemRow = `
             <tr>
                 <td>${serviceItemCode}
@@ -2028,10 +2041,10 @@ jQuery(document).ready(function () {
                     <input type="hidden" name="next_service_days[]" value="">
                 </td>
                 <td>${serviceItemName}</td>
-                <td class="item-price">${serviceSellingPrice.toFixed(2)}</td>
+                <td class="item-price">${serviceItemUnitPrice.toFixed(2)}</td>
                 <td class="item-qty">${serviceQty}</td>
                 <td class="item-discount">0</td>
-                <td class="item-sell-price">${serviceSellingPrice.toFixed(2)}</td>
+                <td class="item-sell-price">${serviceItemUnitPrice.toFixed(2)}</td>
                 <td>${serviceItemTotal.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
