@@ -182,9 +182,10 @@ class Cashbook
             $where   .= " AND DATE(si.invoice_date) >= '$dateFrom'";
         }
 
-        // Cash from sales invoices (payment_type = 1 means cash)
-        $queryCashInvoices = "SELECT COALESCE(SUM(grand_total), 0) as total 
+        // Cash from sales invoices - only include payments made with Cash method (id=1), excludes Bank Transfer (id=3)
+        $queryCashInvoices = "SELECT COALESCE(SUM(ip.amount), 0) as total 
                               FROM `sales_invoice` si
+                              LEFT JOIN `invoice_payments` ip ON si.id = ip.invoice_id AND ip.method_id = 1
                               $where AND si.payment_type = 1 AND si.is_cancel = 0";
         $resultCash = mysqli_fetch_array($db->readQuery($queryCashInvoices));
         $totalCashInvoices = (float) $resultCash['total'];
@@ -355,11 +356,15 @@ class Cashbook
             $where .= " AND DATE(invoice_date) BETWEEN '$dateFrom' AND '$dateTo'";
         }
 
-        // Cash sales invoices
-        $query = "SELECT invoice_date as date, invoice_no as doc, grand_total as amount, 'Cash Sale' as description
-                  FROM sales_invoice 
-                  $where AND payment_type = 1 AND is_cancel = 0
-                  ORDER BY invoice_date ASC";
+        // Cash sales invoices - only include payments made with Cash method (id=1), excludes Bank Transfer (id=3) etc.
+        $query = "SELECT si.invoice_date as date, si.invoice_no as doc, 
+                         COALESCE(SUM(ip.amount), 0) as amount, 'Cash Sale' as description
+                  FROM sales_invoice si
+                  LEFT JOIN invoice_payments ip ON si.id = ip.invoice_id AND ip.method_id = 1
+                  $where AND si.payment_type = 1 AND si.is_cancel = 0
+                  GROUP BY si.id, si.invoice_date, si.invoice_no
+                  HAVING amount > 0
+                  ORDER BY si.invoice_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
             $runningBalance += (float)$row['amount'];
