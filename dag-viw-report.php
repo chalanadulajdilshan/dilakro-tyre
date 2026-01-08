@@ -132,7 +132,7 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                     <th>Date</th>
                                                     <th>Company</th>
                                                     <th>Department</th>
-                                                    <th>Belt Design</th>
+                                                    <th>Belt Category</th>
                                                     <th>Barcode</th>
                                                     <th>Vehicle No</th>
                                                     <th>Qty</th>
@@ -151,7 +151,7 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                             <td><?php echo date('d/m/Y', strtotime($report['received_date'])); ?></td>
                                                             <td><?php echo htmlspecialchars($report['company_name']); ?></td>
                                                             <td><?php echo htmlspecialchars($report['department_name']); ?></td>
-                                                            <td><?php echo htmlspecialchars($report['belt_design']); ?></td>
+                                                            <td><?php echo htmlspecialchars($report['belt_category']); ?></td>
                                                             <td><?php echo htmlspecialchars($report['barcode']); ?></td>
                                                             <td><?php echo htmlspecialchars($report['vehicle_no']); ?></td>
                                                             <td class="text-center"><?php echo $report['qty']; ?></td>

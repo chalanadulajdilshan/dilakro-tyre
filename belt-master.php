@@ -15,7 +15,7 @@ $belt_id = 'BM/0' . ($lastId + 1);
 <head>
 
     <meta charset="utf-8" />
-    <title>Belt Master | <?php echo $COMPANY_PROFILE_DETAILS->name ?> </title>
+    <title>Belt Category Master | <?php echo $COMPANY_PROFILE_DETAILS->name ?> </title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="<?php echo $COMPANY_PROFILE_DETAILS->name ?>" name="author" />
@@ -68,7 +68,7 @@ $belt_id = 'BM/0' . ($lastId + 1);
                         <div class="col-md-4 text-md-end text-start mt-3 mt-md-0">
                             <ol class="breadcrumb m-0 justify-content-md-end">
                                 <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboard</a></li>
-                                <li class="breadcrumb-item active">BELT MASTER</li>
+                                <li class="breadcrumb-item active">BELT CATEGORY MASTER</li>
                             </ol>
                         </div>
                     </div>
@@ -90,7 +90,7 @@ $belt_id = 'BM/0' . ($lastId + 1);
                                             </div>
                                         </div>
                                         <div class="flex-grow-1 overflow-hidden">
-                                            <h5 class="font-size-16 mb-1">Belt Master</h5>
+                                            <h5 class="font-size-16 mb-1">Belt Category Master</h5>
                                             <p class="text-muted text-truncate mb-0">Fill all information below</p>
                                         </div>
                                         <div class="flex-shrink-0">
@@ -120,7 +120,7 @@ $belt_id = 'BM/0' . ($lastId + 1);
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label for="name" class="form-label">Belt Name</label>
+                                                <label for="name" class="form-label">Belt Category Name</label>
                                                 <div class="input-group mb-3">
                                                     <input id="name" name="name" type="text"
                                                         placeholder="Enter Name" class="form-control">
@@ -160,7 +160,7 @@ $belt_id = 'BM/0' . ($lastId + 1);
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="myExtraLargeModalLabel">Manage Belt Types</h5>
+                    <h5 class="modal-title" id="myExtraLargeModalLabel">Manage Belt Categories</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
@@ -175,7 +175,7 @@ $belt_id = 'BM/0' . ($lastId + 1);
                                     <tr>
                                         <th>#</th>
                                         <th>Ref No</th>
-                                        <th>Belt Name</th>
+                                        <th>Belt Category Name</th>
                                         <th>Is Active</th>
 
                                     </tr>

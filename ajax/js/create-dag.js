@@ -203,7 +203,7 @@ jQuery(document).ready(function () {
 
       // Check if required fields are filled
       if (!beltDesignId) {
-        swal("Error!", "Please select Belt Design.", "error");
+        swal("Error!", "Please select Belt Category.", "error");
         return;
       }
       
@@ -279,7 +279,7 @@ jQuery(document).ready(function () {
       // Reset the form inputs
       resetDagInputs();
 
-      // Focus back to belt design for next entry
+      // Focus back to belt category for next entry
       $("#beltDesign").focus();
       
       // Show success message

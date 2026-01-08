@@ -157,7 +157,7 @@ if (isset($_POST['create'])) {
                 $SALES_INVOICE_ITEM->invoice_id = $invoice_id;
                 $SALES_INVOICE_ITEM->item_code = 'DAG-' . $item['dag_item_id'];
                 $SALES_INVOICE_ITEM->service_item_code = 'DAG-' . $_POST['dag_id'];
-                $SALES_INVOICE_ITEM->item_name = $item['vehicle_no'] . ' - ' . $item['belt_design'] . ' - ' . (isset($item['size']) ? $item['size'] : '') . ' - ' . $item['serial_no'];
+                $SALES_INVOICE_ITEM->item_name = $item['vehicle_no'] . ' - ' . $item['belt_category'] . ' - ' . (isset($item['size']) ? $item['size'] : '') . ' - ' . $item['serial_no'];
                 $SALES_INVOICE_ITEM->price = $item['price'];
                 $SALES_INVOICE_ITEM->quantity = 1;
                 $SALES_INVOICE_ITEM->discount = 0;

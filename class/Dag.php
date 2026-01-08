@@ -160,7 +160,7 @@ class Dag
                      c.name as customer_name,
                      dept.name as department_name,
                      dc.name as company_name,
-                     b.name as belt_design,
+                     b.name as belt_category,
                      di.barcode as barcode,
                      di.vehicle_no as item_vehicle_no,
                      di.qty as qty,

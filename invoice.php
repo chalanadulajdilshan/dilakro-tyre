@@ -305,7 +305,7 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                 <tr>
                                     <th>No.</th>
                                     <th>Vehicle No</th>
-                                    <th>Belt Design</th>
+                                    <th>Belt Category</th>
                                     <th>Size</th>
                                     <th>Serial No</th>
                                     <th>Price</th>
@@ -332,7 +332,7 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                     // Parse item name to get individual components
                                     $item_parts = explode(' - ', $temp_items['item_name']);
                                     $vehicle_no = isset($item_parts[0]) ? $item_parts[0] : '';
-                                    $belt_design = isset($item_parts[1]) ? $item_parts[1] : '';
+                                    $belt_category = isset($item_parts[1]) ? $item_parts[1] : '';
                                     $size = isset($item_parts[2]) ? $item_parts[2] : '';
                                     $serial_no = isset($item_parts[3]) ? $item_parts[3] : '';
 
@@ -349,7 +349,7 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                     <tr>
                                         <td>0<?php echo $key; ?></td>
                                         <td><?php echo $vehicle_no; ?></td>
-                                        <td><?php echo $belt_design; ?></td>
+                                        <td><?php echo $belt_category; ?></td>
                                         <td><?php echo $size; ?></td>
                                         <td><?php echo $serial_no; ?></td>
                                         <td><?php echo number_format($price, 2); ?></td>
