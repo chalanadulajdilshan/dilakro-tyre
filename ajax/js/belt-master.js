@@ -43,7 +43,7 @@ jQuery(document).ready(function () {
           if (result.status === "success") {
             swal({
               title: "Success!",
-              text: "Belt Master added Successfully!",
+              text: "Belt Category Master added Successfully!",
               type: "success",
               timer: 2000,
               showConfirmButton: false,
@@ -112,7 +112,7 @@ jQuery(document).ready(function () {
           if (result.status == "success") {
             swal({
               title: "Success!",
-              text: "Belt Master updated Successfully!",
+              text: "Belt Category Master updated Successfully!",
               type: "success",
               timer: 2500,
               showConfirmButton: false,
@@ -146,7 +146,7 @@ jQuery(document).ready(function () {
     if (!name || name === "") {
       swal({
         title: "Error!",
-        text: "Please select a Belt Master first.",
+        text: "Please select a Belt Category Master first.",
         type: "error",
         timer: 2000,
         showConfirmButton: false,
@@ -157,7 +157,7 @@ jQuery(document).ready(function () {
     swal(
       {
         title: "Are you sure?",
-        text: "Do you want to delete '" + name + "' Belt Master?",
+        text: "Do you want to delete '" + name + "' Belt Category Master?",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
@@ -184,7 +184,7 @@ jQuery(document).ready(function () {
               if (response.status === "success") {
                 swal({
                   title: "Deleted!",
-                  text: "Belt Master has been deleted.",
+                  text: "Belt Category Master has been deleted.",
                   type: "success",
                   timer: 2000,
                   showConfirmButton: false,

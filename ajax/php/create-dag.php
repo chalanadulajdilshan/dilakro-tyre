@@ -167,8 +167,28 @@ if (isset($_POST['load_dags'])) {
     $html = '';
     foreach ($dags as $key => $dag) {
         $key++;
-        $DEPARTMENT = new DepartmentMaster($dag['department_id']);
         $CUSTOMER = new CustomerMaster($dag['customer_id']);
+        
+        // Get first DAG item for size, brand, and serial number
+        $DAG_ITEM_MODEL = new DagItem(null);
+        $dag_items = $DAG_ITEM_MODEL->getByDagId($dag['id']);
+        $first_item = !empty($dag_items) ? $dag_items[0] : null;
+        
+        $tyre_size = '';
+        $brand_name = '';
+        $serial_no = '';
+        
+        if ($first_item) {
+            if (!empty($first_item['size_id'])) {
+                $SIZE = new Sizes($first_item['size_id']);
+                $tyre_size = $SIZE->name ?? '';
+            }
+            if (!empty($first_item['brand_id'])) {
+                $BRAND = new Brand($first_item['brand_id']);
+                $brand_name = $BRAND->name ?? '';
+            }
+            $serial_no = $first_item['serial_number'] ?? '';
+        }
 
         $html .= '<tr class="select-dag" data-id="' . $dag['id'] . '"
                     data-ref_no="' . htmlspecialchars($dag['ref_no']) . '"
@@ -181,8 +201,10 @@ if (isset($_POST['load_dags'])) {
                     data-remark="' . htmlspecialchars($dag['remark']) . '">
                     <td>' . $key . '</td>
                     <td>' . htmlspecialchars($dag['ref_no']) . '</td>
-                    <td>' . htmlspecialchars($DEPARTMENT->name) . '</td>
                     <td>' . htmlspecialchars($CUSTOMER->name) . '</td>
+                    <td>' . htmlspecialchars($tyre_size) . '</td>
+                    <td>' . htmlspecialchars($brand_name) . '</td>
+                    <td>' . htmlspecialchars($serial_no) . '</td>
                     <td>' . htmlspecialchars($dag['received_date']) . '</td>
                     <td>' . htmlspecialchars($dag['customer_request_date']) . '</td>
                     <td>

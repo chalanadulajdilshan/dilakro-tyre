@@ -302,10 +302,10 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                 </div>
 
                                                 <div class="col-md-2">
-                                                    <label for="beltDesign" class="form-label">Belt Design</label>
+                                                    <label for="beltDesign" class="form-label">Belt Category</label>
                                                     <div class="input-group">
                                                         <select id="beltDesign" name="belt_design" class="form-select">
-                                                            <option value="">-- Select Belt Design --</option>
+                                                            <option value="">-- Select Belt Category --</option>
                                                             <?php
                                                             $BELT_MASTER = new BeltMaster(NULL);
                                                             foreach ($BELT_MASTER->getActiveBelt() as $belt_master) {
@@ -400,7 +400,7 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                 <table class="table table-bordered">
                                                     <thead class="table-light">
                                                         <tr>
-                                                            <th>Belt Design</th>
+                                                            <th>Belt Category</th>
                                                             <th>Size</th>
                                                             <th>Serial No</th>
                                                             <th>Company</th>
@@ -512,8 +512,10 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                             <tr>
                                 <th>#</th>
                                 <th>Ref No</th>
-                                <th>Department</th>
                                 <th>Customer</th>
+                                <th>Tyre Size</th>
+                                <th>Brand</th>
+                                <th>Serial No</th>
                                 <th>Received Date</th>
                                 <th>Customer Request</th>
                                 <th>Status</th>

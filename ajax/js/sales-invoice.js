@@ -1556,7 +1556,7 @@ jQuery(document).ready(function () {
       .not("#noDagItemRow")
       .each(function () {
       const vehicleNo = $(this).find("td:eq(0)").text().trim();
-      const beltDesign = $(this).find("td:eq(1)").text().trim();
+      const beltCategory = $(this).find("td:eq(1)").text().trim();
       const size = $(this).find("td:eq(2)").text().trim();
       const serialNo = $(this).find("td:eq(3)").text().trim();
       const price = parseFloat($(this).find(".dag-price").val()) || 0;
@@ -1581,7 +1581,7 @@ jQuery(document).ready(function () {
       dagItems.push({
         dag_item_id: dagItemId,
         vehicle_no: vehicleNo,
-        belt_design: beltDesign,
+        belt_category: beltCategory,
         size: size,
         serial_no: serialNo,
         price: price,
