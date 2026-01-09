@@ -177,7 +177,8 @@ if (isset($_POST['create'])) {
             $final_cost += $final_cost_item;
         } else if (substr($item['code'], 0, 2) === 'SI') {
             $SERVICE_ITEM = new ServiceItem($item['item_id']);
-            $final_cost_item = $SERVICE_ITEM->cost * $item['service_qty'];
+            // Do not include cost for service items when invoicing
+            $final_cost_item = 0;
             $final_cost += $final_cost_item;
 
             $available_qty = $SERVICE_ITEM->qty - $item['service_qty'];
@@ -335,8 +336,8 @@ if (isset($_POST['create'])) {
             $SALES_ITEM->item_name = $item['code'] . '|' . $item['name'] . '|ARN:' . $arn_id . '|DEPT:' . $correctDepartmentId;
             $SALES_ITEM->list_price = $item['price']; // Save the original list price
             $SALES_ITEM->price = $item['selling_price']; // Save the actual selling price (price after discount per unit)
-            // Services (SV) should not have cost
-            $SALES_ITEM->cost = (substr($item['code'], 0, 2) === 'SV') ? 0 : $item['cost'];
+            // Services (SI/SV) should not have cost stored
+            $SALES_ITEM->cost = (substr($item['code'], 0, 2) === 'SV' || substr($item['code'], 0, 2) === 'SI') ? 0 : $item['cost'];
             $SALES_ITEM->discount = $item_discount_amount;
             $SALES_ITEM->total = ($item['selling_price'] * $qty_for_total);
             $SALES_ITEM->vehicle_no = isset($item['vehicle_no']) ? $item['vehicle_no'] : '';

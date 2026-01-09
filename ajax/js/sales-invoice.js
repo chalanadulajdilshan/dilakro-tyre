@@ -1760,36 +1760,6 @@ jQuery(document).ready(function () {
       return;
     }
 
-    // Ensure only one service item line can be invoiced at a time
-    if (isServiceItemCode) {
-      let hasServiceItem = false;
-
-      $("#invoiceItemsBody tr").each(function () {
-        const existingCodeInput = $(this)
-          .find('input[name="item_codes[]"]').val();
-        const existingCodeText = $(this).find("td:eq(0)").text().trim();
-        const existingCode = existingCodeInput || existingCodeText;
-
-        if (
-          existingCode &&
-          existingCode.startsWith("SI/")
-        ) {
-          hasServiceItem = true;
-          return false; // break
-        }
-      });
-
-      if (hasServiceItem) {
-        swal({
-          title: "Service Item Limit",
-          text: "Only one service item can be invoiced at a time. Please remove the existing service item before adding another.",
-          type: "warning",
-          timer: 2500,
-          showConfirmButton: false,
-        });
-        return;
-      }
-    }
 
     // Multi-ARN allocation logic for regular items
     if (!isServiceItemCode && !isPureServiceCode) {
