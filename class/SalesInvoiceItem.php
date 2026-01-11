@@ -242,6 +242,12 @@ class SalesInvoiceItem
     {
         // New format: CODE|NAME|ARN:xxx|DEPT:xxx (e.g., "SV/0001|Service Name|ARN:123|DEPT:1")
         // Old format: NAME|ARN:xxx|DEPT:xxx
+        // Also handle: NAME (ARN: xxx) format
+        
+        // Remove ARN in (ARN: xxx) format
+        if (strpos($itemName, '(ARN:') !== false) {
+            $itemName = preg_replace('/\s*\(ARN:\s*[^)]+\)/', '', $itemName);
+        }
         
         // First, remove ARN and DEPT metadata
         if (strpos($itemName, '|ARN:') !== false) {
@@ -256,7 +262,7 @@ class SalesInvoiceItem
             return trim($parts[1]); // Return the name part
         }
         
-        return $itemName;
+        return trim($itemName);
     }
     
 
