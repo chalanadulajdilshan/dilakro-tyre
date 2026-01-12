@@ -25,7 +25,7 @@ include './auth.php';
                 <div class="container-fluid">
                     <div class="row mb-4">
                         <div class="col-md-8 d-flex align-items-center flex-wrap gap-2">
-                            <a href="supplier-payment-new.php" class="btn btn-success">
+                            <a href="supplier-payment-new.php" id="new-supplier-payment" class="btn btn-success">
                                 <i class="uil uil-plus me-1"></i> New Payment
                             </a>
                         </div>
