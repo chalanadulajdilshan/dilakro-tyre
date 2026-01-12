@@ -23,15 +23,7 @@ include './auth.php';
         <div class="main-content">
             <div class="page-content">
                 <div class="container-fluid">
-                    <div class="row mb-4">
-
-                        <div class="col-md-4 text-md-end text-start mt-3 mt-md-0">
-                            <ol class="breadcrumb m-0 justify-content-md-end">
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Supplier Payment History</li>
-                            </ol>
-                        </div>
-                    </div>
+                    
 
                     <section>
                         <div class="row">
