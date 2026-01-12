@@ -519,18 +519,9 @@ include './auth.php';
                                                                     value="Invoice Remarks  " disabled>
                                                             </div>
                                                             <div class="col-7">
-                                                                <select class="form-control" name="remark" id="remark">
-                                                                    <option> -- Select Remark -- </option>
-                                                                    <?php
-                                                                    $INVOICE_REMARK = new InvoiceRemark(null);
-                                                                    foreach ($INVOICE_REMARK->all() as $remark) {
-                                                                    ?>
-                                                                        <option value="<?php echo $remark['id'] ?>">
-                                                                            <?php echo $remark['remark'] ?>
-                                                                        </option>
-                                                                    <?php } ?>
-                                                                </select>
+                                                                <textarea class="form-control" name="remark" id="remark" rows="2" placeholder="Enter invoice remark"></textarea>
                                                             </div>
+
                                                         </div>
 
                                                     </div>
