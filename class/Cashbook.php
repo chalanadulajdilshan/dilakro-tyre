@@ -123,6 +123,7 @@ class Cashbook
     LEFT JOIN banks b ON ct.bank_id = b.id
     LEFT JOIN branches br ON ct.branch_id = br.id
     WHERE ct.created_at BETWEEN '$dateFrom' AND '$dateTo'
+    AND (ct.remark NOT LIKE 'Supplier Payment%' OR ct.remark IS NULL)
     ORDER BY ct.created_at DESC
 ";
  
@@ -565,11 +566,14 @@ class Cashbook
         // Withdrawals
         $whereWithdrawal = str_replace('invoice_date', 'ct.created_at', $where);
         $query = "SELECT ct.created_at as date, ct.ref_no as doc, ct.amount, 
-                  CONCAT(
+                  CASE 
+                    WHEN ct.remark LIKE 'Supplier Payment%' THEN ct.remark
+                    ELSE CONCAT(
                         'Bank Withdrawal - ',
                         COALESCE(NULLIF(b.name, ''), 'Cash Drawer'),
                         CASE WHEN ct.remark IS NOT NULL AND ct.remark <> '' THEN CONCAT(' | ', ct.remark) ELSE '' END
-                  ) as description
+                    )
+                  END as description
                   FROM cashbook_transactions ct
                   LEFT JOIN banks b ON ct.bank_id = b.id
                   $whereWithdrawal AND ct.transaction_type = 'withdrawal'
