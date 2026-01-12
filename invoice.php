@@ -211,20 +211,10 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                 <?php } ?>
                                 <tr>
                                     <td colspan="5" rowspan="5" style="vertical-align:top;  ">
+                                        <?php if (!empty($SALES_INVOICE->remark)): ?>
                                         <h6 style="margin-top:8px;"><strong>Terms & Conditions:</strong></h6>
-                                        <ul style="padding-left:20px;margin-bottom:0;">
-                                            <?php
-                                            $invoiceRemark = new InvoiceRemark();
-                                            $paymentRemarks = $invoiceRemark->getRemarkByPaymentType($SALES_INVOICE->payment_type);
-                                            if (!empty($paymentRemarks)) {
-                                                foreach ($paymentRemarks as $remark) {
-                                                    if (!empty($remark['remark'])) {
-                                                        echo '<li>' . htmlspecialchars($remark['remark']) . '</li>';
-                                                    }
-                                                }
-                                            }
-                                            ?>
-                                        </ul>
+                                        <p style="padding-left:5px;margin-bottom:0;white-space:pre-wrap;"><?php echo htmlspecialchars($SALES_INVOICE->remark); ?></p>
+                                        <?php endif; ?>
                                     </td>
                                     <td colspan="2" class="text-end font-weight-bold"><strong>Gross Amount:-</strong></td>
                                     <td colspan="2" class="text-end font-weight-bold"><strong><?php echo number_format($subtotal, 2); ?></strong></td>
@@ -359,20 +349,10 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                 <?php } ?>
                                 <tr>
                                     <td colspan="5" rowspan="5" style="vertical-align:top;">
-                                        <h6 style="margin-top:8px;"><strong>Terms & Conditions:</strong></h6>
-                                        <ul style="padding-left:20px;margin-bottom:0;">
-                                            <?php
-                                            $invoiceRemark = new InvoiceRemark();
-                                            $paymentRemarks = $invoiceRemark->getRemarkByPaymentType($SALES_INVOICE->payment_type);
-                                            if (!empty($paymentRemarks)) {
-                                                foreach ($paymentRemarks as $remark) {
-                                                    if (!empty($remark['remark'])) {
-                                                        echo '<li>' . htmlspecialchars($remark['remark']) . '</li>';
-                                                    }
-                                                }
-                                            }
-                                            ?>
-                                        </ul>
+                                        <?php if (!empty($SALES_INVOICE->remark)): ?>
+                                        <h6 style="margin-top:8px;"><strong>Remarks:</strong></h6>
+                                        <p style="padding-left:5px;margin-bottom:0;white-space:pre-wrap;"><?php echo htmlspecialchars($SALES_INVOICE->remark); ?></p>
+                                        <?php endif; ?>
                                     </td>
                                     <td colspan="2" class="text-end font-weight-bold"><strong>Gross Amount:-</strong></td>
                                     <td class="text-end font-weight-bold"><strong><?php echo number_format($subtotal, 2); ?></strong></td>
