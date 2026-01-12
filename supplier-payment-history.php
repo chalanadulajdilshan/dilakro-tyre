@@ -24,12 +24,6 @@ include './auth.php';
             <div class="page-content">
                 <div class="container-fluid">
                     <div class="row mb-4">
-                        <div class="col-md-8 d-flex align-items-center flex-wrap gap-2">
-                            <?php $pageQuery = isset($_GET['page_id']) ? '?page_id=' . (int) $_GET['page_id'] : ''; ?>
-                            <a href="supplier-payment-new.php<?php echo $pageQuery; ?>" id="new-supplier-payment" class="btn btn-success">
-                                <i class="uil uil-plus me-1"></i> New Payment
-                            </a>
-                        </div>
 
                         <div class="col-md-4 text-md-end text-start mt-3 mt-md-0">
                             <ol class="breadcrumb m-0 justify-content-md-end">
