@@ -154,7 +154,7 @@ include './auth.php';
                                                         <th>Previous Customer</th>
                                                         <th>Company</th>
                                                         <th>Company Issued Date</th>
-                                                        <th>Company Delivered Date</th>
+                                                        <th>Tyre Received Date</th>
                                                         <th>Job No</th>
                                                         <th>Size</th>
                                                         <th>Casing Cost</th>

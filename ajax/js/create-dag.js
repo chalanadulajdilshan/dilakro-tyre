@@ -165,7 +165,7 @@ jQuery(document).ready(function () {
     $("#department_id, #customer_id, #dag_company_id, #brand_id").val("").trigger("change");
 
     // Reset date inputs
-    $("#received_date, #delivery_date, #customer_request_date, #company_issued_date, #company_delivery_date").val("");
+    $("#received_date, #delivery_date, #customer_request_date, #customer_issue_date, #company_issued_date, #company_delivery_date").val("");
 
     // Reset status to default
     $("#status").val("pending");
@@ -598,6 +598,7 @@ jQuery(document).ready(function () {
     $("#received_date").val(data.received_date);
     $("#delivery_date").val(data.delivery_date);
     $("#customer_request_date").val(data.customer_request_date);
+    $("#customer_issue_date").val(data.customer_issue_date || "");
     $("#remark").val(data.remark);
 
     $("#create").hide();

@@ -61,6 +61,7 @@
                                 data-received_date="<?= $dag['received_date'] ?>"
                                 data-delivery_date="<?= $dag['delivery_date'] ?>"
                                 data-customer_request_date="<?= $dag['customer_request_date'] ?>"
+                                data-customer_issue_date="<?= $dag['customer_issue_date'] ?? '' ?>"
                                 data-dag_company_id="<?= $dag['dag_company_id'] ?? '' ?>"
                                 data-company_issued_date="<?= $dag['company_issued_date'] ?? '' ?>"
                                 data-company_delivery_date="<?= $dag['company_delivery_date'] ?? '' ?>"

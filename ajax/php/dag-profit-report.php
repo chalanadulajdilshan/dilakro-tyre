@@ -237,7 +237,7 @@ function exportDagProfitReport() {
             'Previous Customer',
             'Company',
             'Company Issued Date',
-            'Company Delivered Date',
+            'Tyre Received Date',
             'Job No',
             'Size',
             'Casing Cost',
