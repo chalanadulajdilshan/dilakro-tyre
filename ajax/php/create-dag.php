@@ -18,6 +18,7 @@ if (isset($_POST['create'])) {
     $DAG->received_date = $_POST['received_date'];
     $DAG->delivery_date = $_POST['delivery_date'];
     $DAG->customer_request_date = $_POST['customer_request_date'];
+    $DAG->customer_issue_date = $_POST['customer_issue_date'] ?? null;
     $DAG->vehicle_no = $_POST['vehicle_no'];
     $DAG->remark = $_POST['remark'];
 
@@ -81,6 +82,7 @@ if (isset($_POST['update'])) {
     $DAG->received_date = $_POST['received_date'];
     $DAG->delivery_date = $_POST['delivery_date'];
     $DAG->customer_request_date = $_POST['customer_request_date'];
+    $DAG->customer_issue_date = $_POST['customer_issue_date'] ?? null;
     $DAG->vehicle_no = $_POST['vehicle_no'];
     $DAG->remark = $_POST['remark'];
 
@@ -198,6 +200,7 @@ if (isset($_POST['load_dags'])) {
                     data-vehicle_no="' . htmlspecialchars($dag['vehicle_no']) . '"
                     data-received_date="' . $dag['received_date'] . '"
                     data-customer_request_date="' . $dag['customer_request_date'] . '"
+                    data-customer_issue_date="' . ($dag['customer_issue_date'] ?? '') . '"
                     data-remark="' . htmlspecialchars($dag['remark']) . '">
                     <td>' . $key . '</td>
                     <td>' . htmlspecialchars($dag['ref_no']) . '</td>

@@ -102,7 +102,7 @@ $dagList = $DAG->getByCompany($companyId);
                                                 <th>Ref No</th>
                                                 <th>Customer</th>
                                                 <th>Recived Date</th>
-                                                <th>Com Delivery Date</th>
+                                                <th>Tyre Received Date</th>
                                                 <th>Receipt No</th>
                                                 <th>Status</th>
                                             </tr>

@@ -210,6 +210,17 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                 </div>
                                             </div>
 
+                                            <div class="col-md-2">
+                                                <label for="customer_issue_date" class="form-label">Customer Issue Date</label>
+                                                <div class="input-group">
+
+                                                    <input type="text" class="form-control date-picker-date"
+                                                        id="customer_issue_date" name="customer_issue_date"
+                                                        placeholder="Select Issue Date"> <span
+                                                        class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                                </div>
+                                            </div>
+
                                             <hr class="my-4">
 
                                             <h5 class="mb-3">Add Dag Items</h5>
@@ -246,12 +257,12 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                 </div>
 
                                                 <div class="col-md-2">
-                                                    <label for="company_delivery_date" class="form-label">Company Delivery Date</label>
+                                                    <label for="company_delivery_date" class="form-label">Tyre Received Date</label>
                                                     <div class="input-group" id="delivery_date">
 
                                                         <input type="text" class="form-control date-picker-date"
                                                             id="company_delivery_date" name="company_delivery_date"
-                                                            placeholder="Select Delivery Date"> <span
+                                                            placeholder="Tyre Received Date"> <span
                                                             class="input-group-text"><i class="mdi mdi-calendar"></i></span>
                                                     </div>
                                                 </div>
@@ -405,7 +416,7 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                             <th>Serial No</th>
                                                             <th>Company</th>
                                                             <th>Issued Date</th>
-                                                            <th>Delivery Date</th>
+                                                            <th>Tyre Received Date</th>
                                                             <th>Receipt No</th>
                                                             <th>Brand</th>
                                                             <th>Job Number</th>

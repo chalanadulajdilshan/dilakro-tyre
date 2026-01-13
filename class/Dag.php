@@ -10,6 +10,7 @@ class Dag
     public $received_date;
     public $delivery_date;
     public $customer_request_date;
+    public $customer_issue_date;
     public $vehicle_no;
     public $remark;
 
@@ -32,6 +33,7 @@ class Dag
                 $this->received_date = $result['received_date'];
                 $this->delivery_date = $result['delivery_date'];
                 $this->customer_request_date = $result['customer_request_date'];
+                $this->customer_issue_date = $result['customer_issue_date'] ?? null;
                 $this->vehicle_no = $result['vehicle_no'];
                 $this->remark = $result['remark'];
                 $this->is_print = $result['is_print'];
@@ -46,10 +48,10 @@ class Dag
         $this->remark = mysqli_real_escape_string($db->DB_CON, $this->remark);
 
         $query = "INSERT INTO `dag` (
-            `ref_no`, `department_id`,`customer_id`, `received_date`, `delivery_date`, `customer_request_date`,
+            `ref_no`, `department_id`,`customer_id`, `received_date`, `delivery_date`, `customer_request_date`, `customer_issue_date`,
             `vehicle_no`, `remark`
         ) VALUES (
-            '{$this->ref_no}', '{$this->department_id}','{$this->customer_id}', '{$this->received_date}', '{$this->delivery_date}', '{$this->customer_request_date}',
+            '{$this->ref_no}', '{$this->department_id}','{$this->customer_id}', '{$this->received_date}', '{$this->delivery_date}', '{$this->customer_request_date}', '{$this->customer_issue_date}',
             '{$this->vehicle_no}', '{$this->remark}'
         )";
 
@@ -73,6 +75,7 @@ class Dag
             `received_date` = '{$this->received_date}',
             `delivery_date` = '{$this->delivery_date}',
             `customer_request_date` = '{$this->customer_request_date}',
+            `customer_issue_date` = '{$this->customer_issue_date}',
             `vehicle_no` = '{$this->vehicle_no}',
             `remark` = '{$this->remark}',
             `is_print` = '{$this->is_print}'
