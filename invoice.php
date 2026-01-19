@@ -338,32 +338,35 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                     </tr>
                                 <?php } ?>
                                 <tr>
-                                    <td colspan="6" rowspan="5" style="vertical-align:top;">
+                                    <td colspan="6" style="vertical-align:top;">
                                         <?php if (!empty($SALES_INVOICE->remark)): ?>
                                         <h6 style="margin-top:8px;"><strong>Remarks:</strong></h6>
                                         <p style="padding-left:5px;margin-bottom:0;white-space:pre-wrap;"><?php echo htmlspecialchars($SALES_INVOICE->remark); ?></p>
                                         <?php endif; ?>
                                     </td>
-                                    <td colspan="1" class="text-end font-weight-bold"><strong>Gross Amount:-</strong></td>
+                                    <td class="text-end font-weight-bold"><strong>Gross Amount:-</strong></td>
                                     <td class="text-end font-weight-bold"><strong><?php echo number_format($subtotal, 2); ?></strong></td>
                                 </tr>
                                 <?php if ($SALES_INVOICE->payment_type == 2): // Credit payment ?>
                                 <tr>
-                                    <td colspan="1" class="text-end font-weight-bold"><strong>Paid Amount:-</strong></td>
+                                    <td colspan="6"></td>
+                                    <td class="text-end font-weight-bold"><strong>Paid Amount:-</strong></td>
                                     <td class="text-end font-weight-bold"><strong><?php echo number_format($SALES_INVOICE->outstanding_settle_amount, 2); ?></strong></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="1" class="text-end font-weight-bold"><strong>Payable Amount:-</strong></td>
+                                    <td colspan="6"></td>
+                                    <td class="text-end font-weight-bold"><strong>Payable Amount:-</strong></td>
                                     <td class="text-end font-weight-bold"><strong><?php echo number_format($SALES_INVOICE->grand_total - $SALES_INVOICE->outstanding_settle_amount, 2); ?></strong></td>
                                 </tr>
                                 <?php endif; ?>
 
                                 <tr>
-                                    <td colspan="1" class="text-end"><strong>Net Amount:-</strong></td>
+                                    <td colspan="6"></td>
+                                    <td class="text-end"><strong>Net Amount:-</strong></td>
                                     <td class="text-end"><strong><?php echo number_format($subtotal, 2); ?></strong></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="9" style="padding-top:120px !important;">
+                                    <td colspan="8" style="padding-top:80px !important;">
                                         <table style="width:100%;">
                                             <tr>
                                                 <td style="text-align:center;">_________________________<br><strong>Prepared By</strong></td>
