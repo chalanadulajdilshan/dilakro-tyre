@@ -17,6 +17,7 @@ class SalesInvoiceItem
     public $current_km;
     public $next_service_date;
     public $serial_number;
+    public $job_no;
     public $created_at;
 
     public function __construct($id = null)
@@ -44,6 +45,7 @@ class SalesInvoiceItem
                 $this->current_km = $result['current_km'] ?? '';
                 $this->next_service_date = $result['next_service_date'] ?? '';
                 $this->serial_number = $result['serial_number'] ?? '';
+                $this->job_no = $result['job_no'] ?? '';
                 $this->created_at = $result['created_at'];
             }
         }
@@ -54,7 +56,7 @@ class SalesInvoiceItem
 
 
         $query = "INSERT INTO `sales_invoice_items` 
-    (`invoice_id`, `item_code`, `service_item_code`, `item_name`,`cost`, `list_price`, `price`, `discount`,`quantity`, `total`, `vehicle_no`, `current_km`, `next_service_date`, `serial_number`, `created_at`) 
+    (`invoice_id`, `item_code`, `service_item_code`, `item_name`,`cost`, `list_price`, `price`, `discount`,`quantity`, `total`, `vehicle_no`, `current_km`, `next_service_date`, `serial_number`, `job_no`, `created_at`) 
     VALUES (
         '{$this->invoice_id}', 
         '{$this->item_code}', 
@@ -70,6 +72,7 @@ class SalesInvoiceItem
         '{$this->current_km}',
         '{$this->next_service_date}',
         '{$this->serial_number}',
+        '{$this->job_no}',
         NOW()
     )";
 

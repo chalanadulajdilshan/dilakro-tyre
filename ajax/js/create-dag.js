@@ -14,6 +14,21 @@ jQuery(document).ready(function () {
     }
   });
 
+  // Toggle cost field based on DAG status
+  $(document).on("change", "#dag_status", function() {
+    const status = $(this).val();
+    console.log("DAG Status changed to:", status);
+    
+    if (status === "received") {
+      console.log("Showing cost field");
+      $("#casing_cost_section").slideDown();
+    } else {
+      console.log("Hiding cost field");
+      $("#casing_cost_section").slideUp();
+      $("#casing_cost").val(""); // Clear cost when hiding
+    }
+  });
+
   // Store DAG-level customer values before modal opens when Previous Customer is enabled
   let dagCustomerBackup = { id: '', code: '', name: '' };
   let isItemCustomerSelection = false;
@@ -151,6 +166,7 @@ jQuery(document).ready(function () {
     $("#sizeDesign").val("").trigger("change");
     $("#brand_id").val("").trigger("change");
     $("#serial_num1").val("");
+    $("#casing_cost").val("");
     $("#has_previous_customer").prop("checked", false).trigger("change");
     $("#item_customer_code").val("");
     $("#item_customer_name").val("");
@@ -233,6 +249,9 @@ jQuery(document).ready(function () {
       const jobNumberElement = $("#job_number");
       const jobNumber = jobNumberElement.length ? (jobNumberElement.val() || "") : "";
       
+      const casingCostElement = $("#casing_cost");
+      const casingCost = casingCostElement.length ? (casingCostElement.val() || "0") : "0";
+      
       const statusElement = $("#dag_status");
       const statusValue = statusElement.length ? (statusElement.val() || "") : "";
       const statusText = statusElement.length ? (statusElement.find("option:selected").text() || "") : "";
@@ -254,6 +273,7 @@ jQuery(document).ready(function () {
           <td>${receiptNo}<input type="hidden" name="receipt_no[]" value="${receiptNo}"></td>
           <td>${brandText}<input type="hidden" name="brand_id[]" class="brand_id" value="${brandId}"></td>
           <td>${jobNumber}<input type="hidden" name="job_number[]" value="${jobNumber}"></td>
+          <td>${parseFloat(casingCost).toFixed(2)}<input type="hidden" name="casing_cost[]" class="casing_cost" value="${casingCost}"></td>
           <td>${statusText}<input type="hidden" name="status[]" value="${statusValue}"></td>
           <td>${itemCustomerName || ''}<input type="hidden" name="item_customer_id[]" class="item_customer_id" value="${itemCustomerId}"></td>
           <td>
@@ -359,6 +379,7 @@ jQuery(document).ready(function () {
         receipt_no: $(this).find("input[name='receipt_no[]']").val(),
         brand_id: $(this).find("input[name='brand_id[]']").val(),
         job_number: $(this).find("input[name='job_number[]']").val(),
+        casing_cost: $(this).find("input[name='casing_cost[]']").val() || 0,
         status: $(this).find("input[name='status[]']").val(),
         customer_id: $(this).find("input[name='item_customer_id[]']").val() || null
       });
@@ -502,6 +523,7 @@ jQuery(document).ready(function () {
         receipt_no: $(this).find("input[name='receipt_no[]']").val(),
         brand_id: $(this).find("input[name='brand_id[]']").val(),
         job_number: $(this).find("input[name='job_number[]']").val(),
+        casing_cost: $(this).find("input[name='casing_cost[]']").val() || 0,
         status: $(this).find("input[name='status[]']").val(),
         customer_id: $(this).find("input[name='item_customer_id[]']").val() || null
       });
@@ -534,10 +556,41 @@ jQuery(document).ready(function () {
   $(document).on("click", ".edit-item", function () {
     const row = $(this).closest("tr");
 
+    // Populate basic fields
     $("#beltDesign").val(row.find(".belt_id").val()).trigger("change");
     $("#sizeDesign").val(row.find(".size_id").val()).trigger("change");
     $("#serial_num1").val(row.find(".serial_num1").val());
     $("#brand_id").val(row.find(".brand_id").val()).trigger("change");
+    
+    // Populate company and date fields
+    $("#dag_company_id").val(row.find("input[name='dag_company_id[]']").val()).trigger("change");
+    $("#company_issued_date").val(row.find("input[name='company_issued_date[]']").val());
+    $("#company_delivery_date").val(row.find("input[name='company_delivery_date[]']").val());
+    $("#receipt_no").val(row.find("input[name='receipt_no[]']").val());
+    $("#job_number").val(row.find("input[name='job_number[]']").val());
+    
+    // Populate cost field
+    const costValue = row.find(".casing_cost").val();
+    $("#casing_cost").val(costValue);
+    
+    // Populate status and show cost field if status is 'received'
+    const statusValue = row.find("input[name='status[]']").val();
+    $("#dag_status").val(statusValue).trigger("change");
+    
+    // Populate customer info if exists
+    const itemCustomerId = row.find(".item_customer_id").val();
+    if (itemCustomerId && itemCustomerId !== "null" && itemCustomerId !== "") {
+      $("#has_previous_customer").prop("checked", true).trigger("change");
+      $("#item_customer_id").val(itemCustomerId);
+      // Get customer code and name from the visible text in the row
+      const customerText = row.find("td").eq(11).text().trim(); // Previous Customer column index might be 11 now with Cost added
+      $("#item_customer_name").val(customerText);
+    } else {
+      $("#has_previous_customer").prop("checked", false).trigger("change");
+      $("#item_customer_id").val("");
+      $("#item_customer_code").val("");
+      $("#item_customer_name").val("");
+    }
 
     row.remove();
 
@@ -652,6 +705,7 @@ jQuery(document).ready(function () {
     <td>${item.receipt_no || ''}<input type="hidden" name="receipt_no[]" value="${item.receipt_no}"></td>
     <td>${item.brand_name || ''}<input type="hidden" name="brand_id[]" class="brand_id" value="${item.brand_id}"></td>
     <td>${item.job_number || ''}<input type="hidden" name="job_number[]" value="${item.job_number}"></td>
+    <td>${parseFloat(item.casing_cost || 0).toFixed(2)}<input type="hidden" name="casing_cost[]" class="casing_cost" value="${item.casing_cost || 0}"></td>
     <td>${item.status || ''}<input type="hidden" name="status[]" value="${item.status}"></td>
     <td>${item.customer_name || ''}<input type="hidden" name="item_customer_id[]" class="item_customer_id" value="${item.customer_id || ''}"></td>
     <td>
@@ -681,6 +735,11 @@ jQuery(document).ready(function () {
                   </td>
                 </tr>`;
               $("#dagItemsBodyInvoice").append(invoiceRow);
+              
+              // Check if this item has 'received' status and show cost field if so
+              if (item.status === 'received') {
+                $("#casing_cost_section").show();
+              }
               
             } catch (error) {
               console.error(`Error processing item ${index + 1}:`, error);

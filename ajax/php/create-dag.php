@@ -37,6 +37,7 @@ if (isset($_POST['create'])) {
                 $DAG_ITEM->serial_number = $item['serial_num1'];
                 $DAG_ITEM->qty = 1; // Always set qty to 1
                 $DAG_ITEM->is_invoiced = 0; // Default not invoiced
+                $DAG_ITEM->casing_cost = isset($item['casing_cost']) ? $item['casing_cost'] : 0;
                 $DAG_ITEM->dag_company_id = $item['dag_company_id'];
                 $DAG_ITEM->company_issued_date = $item['company_issued_date'];
                 $DAG_ITEM->company_delivery_date = $item['company_delivery_date'];
@@ -102,6 +103,7 @@ if (isset($_POST['update'])) {
                 $DAG_ITEM->serial_number = $item['serial_num1'];
                 $DAG_ITEM->qty = 1; // Always set qty to 1
                 $DAG_ITEM->is_invoiced = 0; // Default not invoiced
+                $DAG_ITEM->casing_cost = isset($item['casing_cost']) ? $item['casing_cost'] : 0;
                 $DAG_ITEM->dag_company_id = $item['dag_company_id'];
                 $DAG_ITEM->company_issued_date = $item['company_issued_date'];
                 $DAG_ITEM->company_delivery_date = $item['company_delivery_date'];

@@ -259,21 +259,8 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                     <?php
                     // Get DAG details if available
                     $DAG = null;
-                    $dagJobNumber = '';
                     if ($SALES_INVOICE->ref_id) {
                         $DAG = new Dag($SALES_INVOICE->ref_id);
-
-                        if ($DAG && $DAG->id) {
-                            $dagItemModel = new DagItem(null);
-                            $dagItemsForJob = $dagItemModel->getByDagId($DAG->id);
-
-                            if (!empty($dagItemsForJob)) {
-                                $firstDagItem = reset($dagItemsForJob);
-                                if (!empty($firstDagItem['job_number'])) {
-                                    $dagJobNumber = $firstDagItem['job_number'];
-                                }
-                            }
-                        }
                     }
                     ?>
 
@@ -283,8 +270,7 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                             <div class="col-12">
                                 <div class="alert alert-info">
                                     <strong>DAG Details:</strong>
-                                    DAG Ref No: <?php echo htmlspecialchars($DAG->ref_no); ?> |
-                                    Job Number: <?php echo $dagJobNumber !== '' ? htmlspecialchars($dagJobNumber) : 'N/A'; ?>
+                                    DAG Ref No: <?php echo htmlspecialchars($DAG->ref_no); ?>
                                 </div>
                             </div>
                         </div>
@@ -299,8 +285,8 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                     <th>Belt Category</th>
                                     <th>Size</th>
                                     <th>Serial No</th>
+                                    <th>Job No</th>
                                     <th>Price</th>
-                                    <th>Cost</th>
                                     <th class="text-end">Total</th>
                                 </tr>
                             </thead>
@@ -326,6 +312,9 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                     $belt_category = isset($item_parts[1]) ? $item_parts[1] : '';
                                     $size = isset($item_parts[2]) ? $item_parts[2] : '';
                                     $serial_no = isset($item_parts[3]) ? $item_parts[3] : '';
+                                    
+                                    // Get job_no from sales invoice item
+                                    $job_no = isset($temp_items['job_no']) ? $temp_items['job_no'] : '';
 
                                     // For DAG items, if size is not in item_name, try to get it from DAG item lookup
                                     if (empty($size) && strpos($temp_items['item_code'], 'DAG-') === 0) {
@@ -343,41 +332,38 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                         <td><?php echo $belt_category; ?></td>
                                         <td><?php echo $size; ?></td>
                                         <td><?php echo $serial_no; ?></td>
+                                        <td><?php echo $job_no; ?></td>
                                         <td><?php echo number_format($price, 2); ?></td>
-                                        <td><?php echo number_format($cost, 2); ?></td>
                                         <td class="text-end"><?php echo number_format($line_total, 2); ?></td>
                                     </tr>
                                 <?php } ?>
                                 <tr>
-                                    <td colspan="5" rowspan="5" style="vertical-align:top;">
+                                    <td colspan="6" rowspan="5" style="vertical-align:top;">
                                         <?php if (!empty($SALES_INVOICE->remark)): ?>
                                         <h6 style="margin-top:8px;"><strong>Remarks:</strong></h6>
                                         <p style="padding-left:5px;margin-bottom:0;white-space:pre-wrap;"><?php echo htmlspecialchars($SALES_INVOICE->remark); ?></p>
                                         <?php endif; ?>
                                     </td>
-                                    <td colspan="2" class="text-end font-weight-bold"><strong>Gross Amount:-</strong></td>
+                                    <td colspan="1" class="text-end font-weight-bold"><strong>Gross Amount:-</strong></td>
                                     <td class="text-end font-weight-bold"><strong><?php echo number_format($subtotal, 2); ?></strong></td>
                                 </tr>
                                 <?php if ($SALES_INVOICE->payment_type == 2): // Credit payment ?>
                                 <tr>
-                                    <td colspan="2" class="text-end font-weight-bold"><strong>Paid Amount:-</strong></td>
+                                    <td colspan="1" class="text-end font-weight-bold"><strong>Paid Amount:-</strong></td>
                                     <td class="text-end font-weight-bold"><strong><?php echo number_format($SALES_INVOICE->outstanding_settle_amount, 2); ?></strong></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="2" class="text-end font-weight-bold"><strong>Payable Amount:-</strong></td>
+                                    <td colspan="1" class="text-end font-weight-bold"><strong>Payable Amount:-</strong></td>
                                     <td class="text-end font-weight-bold"><strong><?php echo number_format($SALES_INVOICE->grand_total - $SALES_INVOICE->outstanding_settle_amount, 2); ?></strong></td>
                                 </tr>
                                 <?php endif; ?>
+
                                 <tr>
-                                    <td colspan="2" class="text-end font-weight-bold">Total Cost:-</td>
-                                    <td class="text-end font-weight-bold"><?php echo number_format($total_cost, 2); ?></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="text-end"><strong>Net Amount:-</strong></td>
+                                    <td colspan="1" class="text-end"><strong>Net Amount:-</strong></td>
                                     <td class="text-end"><strong><?php echo number_format($subtotal, 2); ?></strong></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="8" style="padding-top:120px !important;">
+                                    <td colspan="9" style="padding-top:120px !important;">
                                         <table style="width:100%;">
                                             <tr>
                                                 <td style="text-align:center;">_________________________<br><strong>Prepared By</strong></td>

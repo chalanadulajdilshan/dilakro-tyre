@@ -427,6 +427,7 @@ include './auth.php';
                                                             <th>Belt Category</th>
                                                             <th>Size</th>
                                                             <th>Serial No</th>
+                                                            <th>Job No</th>
                                                             <th>Cost</th>
                                                             <th>Price</th>
                                                             <th>Action</th>
@@ -434,7 +435,7 @@ include './auth.php';
                                                     </thead>
                                                     <tbody id="dagItemsBodyInvoice">
                                                         <tr id="noDagItemRow">
-                                                            <td colspan="7" class="text-center text-muted">No items
+                                                            <td colspan="8" class="text-center text-muted">No items
                                                                 added</td>
                                                         </tr>
                                                     </tbody>

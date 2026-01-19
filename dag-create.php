@@ -298,6 +298,14 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                         placeholder="Job Number" class="form-control">
                                                 </div>
 
+
+                                                <div class="col-md-2" id="casing_cost_section" style="display:none;">
+                                                    <label class="form-label" for="casing_cost">Cost </label>
+                                                    <input id="casing_cost" name="casing_cost" type="number" step="0.01"
+                                                        placeholder="Enter Cost" class="form-control">
+                                                </div>
+
+
                                                 <div class="col-md-2">
                                                     <label for="dag_status" class="form-label">Dag Status</label>
                                                     <div class="input-group mb-3">
@@ -420,6 +428,7 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                             <th>Receipt No</th>
                                                             <th>Brand</th>
                                                             <th>Job Number</th>
+                                                            <th>Cost</th>
                                                             <th>Status</th>
                                                             <th>Previous Customer</th>
                                                             <th>Action</th>
@@ -427,7 +436,7 @@ $dag_id = 'DC/00/' . ($lastId + 1);
                                                     </thead>
                                                     <tbody id="dagItemsBody">
                                                         <tr id="noDagItemRow">
-                                                            <td colspan="12" class="text-center text-muted">No items
+                                                            <td colspan="13" class="text-center text-muted">No items
                                                                 added</td>
                                                         </tr>
                                                     </tbody>

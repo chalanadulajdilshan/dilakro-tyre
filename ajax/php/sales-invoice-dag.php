@@ -153,7 +153,7 @@ if (isset($_POST['create'])) {
         // Create invoice items for each DAG item
         foreach ($items as $item) {
             if (isset($item['is_dag']) && $item['is_dag']) {
-                $SALES_INVOICE_ITEM = new SalesInvoiceItem(NULL);
+                            $SALES_INVOICE_ITEM = new SalesInvoiceItem(NULL);
                 $SALES_INVOICE_ITEM->invoice_id = $invoice_id;
                 $SALES_INVOICE_ITEM->item_code = 'DAG-' . $item['dag_item_id'];
                 $SALES_INVOICE_ITEM->service_item_code = 'DAG-' . $_POST['dag_id'];
@@ -163,6 +163,7 @@ if (isset($_POST['create'])) {
                 $SALES_INVOICE_ITEM->discount = 0;
                 $SALES_INVOICE_ITEM->total = $item['price'];
                 $SALES_INVOICE_ITEM->cost = $item['cost'];
+                $SALES_INVOICE_ITEM->job_no = isset($item['job_no']) ? $item['job_no'] : '';
                 $SALES_INVOICE_ITEM->create();
 
                 // Log audit

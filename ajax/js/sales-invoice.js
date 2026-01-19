@@ -8,8 +8,6 @@ jQuery(document).ready(function () {
     loadItems();
   });
 
- 
-
   //LOARD ITEM MASTER
   $("#item_item_code").on("keyup", function () {
     loadItems();
@@ -57,7 +55,7 @@ jQuery(document).ready(function () {
 
   // BIND ENTER KEY TO ADD ITEM
   $(
-    "#itemCode, #itemName, #itemPrice, #itemQty, #itemDiscount ,#itemSalePrice"
+    "#itemCode, #itemName, #itemPrice, #itemQty, #itemDiscount ,#itemSalePrice",
   ).on("keydown", function (e) {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -87,7 +85,7 @@ jQuery(document).ready(function () {
   function loadItems(page = 1) {
     // Hide any previous table (if needed)
     $("#serviceItemTable").hide();
-  
+
     // Show a loading row in the table body
     $("#itemMaster tbody").html(`
       <tr>
@@ -97,17 +95,17 @@ jQuery(document).ready(function () {
         </td>
       </tr>
     `);
-  
+
     // Clear old pagination
     $("#itemPagination").empty();
-  
+
     // Collect filters
     let brand_id = $("#item_brand_id").val();
     let category_id = $("#item_category_id").val();
     let group_id = $("#item_group_id").val();
     let department_id = $("#item_department_id").val();
     let item_code = $("#item_item_code").val().trim();
-  
+
     // Perform AJAX
     $.ajax({
       url: "ajax/php/report.php",
@@ -123,7 +121,7 @@ jQuery(document).ready(function () {
       },
       success: function (data) {
         fullItemList = data || [];
-  
+
         if (fullItemList.length === 0) {
           $("#itemMaster tbody").html(`
             <tr>
@@ -147,7 +145,6 @@ jQuery(document).ready(function () {
       },
     });
   }
-  
 
   //append to model to data in this funtion
   function renderPaginatedItems(page = 1) {
@@ -236,7 +233,7 @@ jQuery(document).ready(function () {
                         <td colspan="1" style="width: 15%;"><strong>ARN:</strong> ${arnId}
                         
                         <div style="font-size: 12px; color: red">Cost: ${Number(
-                          row.final_cost
+                          row.final_cost,
                         ).toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                         })}</div>
@@ -256,7 +253,7 @@ jQuery(document).ready(function () {
                         <td style="width: 15%;">
                             <div><strong>List Price:</strong></div>
                             <div class='text-danger'><b>${Number(
-                              item.list_price
+                              item.list_price,
                             ).toLocaleString("en-US", {
                               minimumFractionDigits: 2,
                             })}</b></div>
@@ -265,7 +262,7 @@ jQuery(document).ready(function () {
                         <td style="width: 15%;">
                             <div><strong>Sales Price:</strong></div>
                             <div class='text-danger'><b>${Number(
-                              item.invoice_price
+                              item.invoice_price,
                             ).toLocaleString("en-US", {
                               minimumFractionDigits: 2,
                             })}</b></div>
@@ -326,7 +323,7 @@ jQuery(document).ready(function () {
 
   function addServiceItem() {
     $(
-      "#itemCode, #itemName, #itemPrice,#item_cost_arn, #itemQty, #itemDiscount, #item_id, #itemSalePrice"
+      "#itemCode, #itemName, #itemPrice,#item_cost_arn, #itemQty, #itemDiscount, #item_id, #itemSalePrice",
     ).val("");
     // Show the searchable dropdown
     $("#serviceItemTable").slideDown().focus(); // nicer animation than .show()
@@ -652,13 +649,12 @@ jQuery(document).ready(function () {
     setTimeout(() => $("#itemQty").focus(), 200);
 
     let itemMasterModal = bootstrap.Modal.getInstance(
-      document.getElementById("item_master")
+      document.getElementById("item_master"),
     );
     if (itemMasterModal) {
       itemMasterModal.hide();
     }
   });
-  
 
   $(document).on("click", "#all_itemMaster tbody tr", function () {
     let mainRow = $(this).closest("tr.table-primary"); // ✅ pick the clicked row
@@ -683,7 +679,7 @@ jQuery(document).ready(function () {
     setTimeout(() => $("#itemQty").focus(), 200);
 
     let itemMasterModal = bootstrap.Modal.getInstance(
-      document.getElementById("all_item_master")
+      document.getElementById("all_item_master"),
     );
     if (itemMasterModal) {
       itemMasterModal.hide();
@@ -691,9 +687,6 @@ jQuery(document).ready(function () {
   });
 
   $(document).on("click", "#itemMaster tbody tr.table-info", function () {
-
-
-    
     // Get the main item row
     let mainRow = $(this).prevAll("tr.table-primary").first();
     let lastColValue = mainRow.find("td").last().text();
@@ -764,7 +757,7 @@ jQuery(document).ready(function () {
     setTimeout(() => $("#itemQty").focus(), 200);
 
     let itemMasterModal = bootstrap.Modal.getInstance(
-      document.getElementById("item_master")
+      document.getElementById("item_master"),
     );
     if (itemMasterModal) {
       itemMasterModal.hide();
@@ -883,75 +876,89 @@ jQuery(document).ready(function () {
       success: function (checkRes) {
         if (checkRes.exists) {
           // Show confirmation dialog for duplicate invoice
-          swal({
-            title: "Duplicate Invoice Number!",
-            text:
-              "Invoice No <strong>" + invoiceNo + "</strong> already exists. This may be due to document tracking not being updated. Would you like to increment the document tracking ID and generate a new invoice number?",
-            type: "warning",
-            html: true,
-            showCancelButton: true,
-            confirmButtonText: "Yes, Update & Continue",
-            cancelButtonText: "No, Cancel",
-            closeOnConfirm: false,
-            closeOnCancel: true,
-          }, function(isConfirm) {
-            if (isConfirm) {
-              // User confirmed, resolve the duplicate
-              const paymentType = $('input[name="payment_type"]:checked').val();
-              
-              $.ajax({
-                url: "ajax/php/sales-invoice.php",
-                method: "POST",
-                data: {
-                  action: "resolve_duplicate_invoice",
-                  payment_type: paymentType,
-                },
-                dataType: "json",
-                success: function (resolveRes) {
-                  if (resolveRes.status === 'success') {
-                    // Update the invoice number field with the new ID
-                    $("#invoice_no").val(resolveRes.invoice_id);
-                    
-                    swal({
-                      title: "Success!",
-                      text: "Document tracking updated. New invoice number: <strong>" + resolveRes.invoice_id + "</strong>",
-                      type: "success",
-                      html: true,
-                      timer: 2000,
-                      showConfirmButton: false,
-                    });
-                    
-                    // Open payment modal with new invoice number
-                    setTimeout(function() {
-                      $("#modal_invoice_id").val(invoiceId);
-                      $("#modalFinalTotal").val(total.toFixed(2));
-                      $("#amountPaid").val("");
-                      $("#paymentType").val("1");
-                      $("#balanceAmount").val("0.00").removeClass("text-danger");
-                      $("#paymentModal").modal("show");
-                    }, 2000);
-                  } else {
+          swal(
+            {
+              title: "Duplicate Invoice Number!",
+              text:
+                "Invoice No <strong>" +
+                invoiceNo +
+                "</strong> already exists. This may be due to document tracking not being updated. Would you like to increment the document tracking ID and generate a new invoice number?",
+              type: "warning",
+              html: true,
+              showCancelButton: true,
+              confirmButtonText: "Yes, Update & Continue",
+              cancelButtonText: "No, Cancel",
+              closeOnConfirm: false,
+              closeOnCancel: true,
+            },
+            function (isConfirm) {
+              if (isConfirm) {
+                // User confirmed, resolve the duplicate
+                const paymentType = $(
+                  'input[name="payment_type"]:checked',
+                ).val();
+
+                $.ajax({
+                  url: "ajax/php/sales-invoice.php",
+                  method: "POST",
+                  data: {
+                    action: "resolve_duplicate_invoice",
+                    payment_type: paymentType,
+                  },
+                  dataType: "json",
+                  success: function (resolveRes) {
+                    if (resolveRes.status === "success") {
+                      // Update the invoice number field with the new ID
+                      $("#invoice_no").val(resolveRes.invoice_id);
+
+                      swal({
+                        title: "Success!",
+                        text:
+                          "Document tracking updated. New invoice number: <strong>" +
+                          resolveRes.invoice_id +
+                          "</strong>",
+                        type: "success",
+                        html: true,
+                        timer: 2000,
+                        showConfirmButton: false,
+                      });
+
+                      // Open payment modal with new invoice number
+                      setTimeout(function () {
+                        $("#modal_invoice_id").val(invoiceId);
+                        $("#modalFinalTotal").val(total.toFixed(2));
+                        $("#amountPaid").val("");
+                        $("#paymentType").val("1");
+                        $("#balanceAmount")
+                          .val("0.00")
+                          .removeClass("text-danger");
+                        $("#paymentModal").modal("show");
+                      }, 2000);
+                    } else {
+                      swal({
+                        title: "Error!",
+                        text:
+                          resolveRes.message ||
+                          "Unable to resolve duplicate invoice.",
+                        type: "error",
+                        timer: 3000,
+                        showConfirmButton: false,
+                      });
+                    }
+                  },
+                  error: function () {
                     swal({
                       title: "Error!",
-                      text: resolveRes.message || "Unable to resolve duplicate invoice.",
+                      text: "Unable to update document tracking.",
                       type: "error",
                       timer: 3000,
                       showConfirmButton: false,
                     });
-                  }
-                },
-                error: function () {
-                  swal({
-                    title: "Error!",
-                    text: "Unable to update document tracking.",
-                    type: "error",
-                    timer: 3000,
-                    showConfirmButton: false,
-                  });
-                },
-              });
-            }
-          });
+                  },
+                });
+              }
+            },
+          );
           return;
         }
 
@@ -1020,70 +1027,82 @@ jQuery(document).ready(function () {
         success: function (checkRes) {
           if (checkRes.exists) {
             // Show confirmation dialog for duplicate invoice
-            swal({
-              title: "Duplicate Invoice Number!",
-              text:
-                "Invoice No <strong>" + invoiceNo + "</strong> already exists. This may be due to document tracking not being updated. Would you like to increment the document tracking ID and generate a new invoice number?",
-              type: "warning",
-              html: true,
-              showCancelButton: true,
-              confirmButtonText: "Yes, Update & Continue",
-              cancelButtonText: "No, Cancel",
-              closeOnConfirm: false,
-              closeOnCancel: true,
-            }, function(isConfirm) {
-              if (isConfirm) {
-                // User confirmed, resolve the duplicate
-                const paymentType = $('input[name="payment_type"]:checked').val();
-                
-                $.ajax({
-                  url: "ajax/php/sales-invoice.php",
-                  method: "POST",
-                  data: {
-                    action: "resolve_duplicate_invoice",
-                    payment_type: paymentType,
-                  },
-                  dataType: "json",
-                  success: function (resolveRes) {
-                    if (resolveRes.status === 'success') {
-                      // Update the invoice number field with the new ID
-                      $("#invoice_no").val(resolveRes.invoice_id);
-                      
-                      swal({
-                        title: "Success!",
-                        text: "Document tracking updated. New invoice number: <strong>" + resolveRes.invoice_id + "</strong>. Proceeding with invoice creation...",
-                        type: "success",
-                        html: true,
-                        timer: 2000,
-                        showConfirmButton: false,
-                      });
-                      
-                      // Proceed with invoice creation after a short delay
-                      setTimeout(function() {
-                        processInvoiceCreation();
-                      }, 2000);
-                    } else {
+            swal(
+              {
+                title: "Duplicate Invoice Number!",
+                text:
+                  "Invoice No <strong>" +
+                  invoiceNo +
+                  "</strong> already exists. This may be due to document tracking not being updated. Would you like to increment the document tracking ID and generate a new invoice number?",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonText: "Yes, Update & Continue",
+                cancelButtonText: "No, Cancel",
+                closeOnConfirm: false,
+                closeOnCancel: true,
+              },
+              function (isConfirm) {
+                if (isConfirm) {
+                  // User confirmed, resolve the duplicate
+                  const paymentType = $(
+                    'input[name="payment_type"]:checked',
+                  ).val();
+
+                  $.ajax({
+                    url: "ajax/php/sales-invoice.php",
+                    method: "POST",
+                    data: {
+                      action: "resolve_duplicate_invoice",
+                      payment_type: paymentType,
+                    },
+                    dataType: "json",
+                    success: function (resolveRes) {
+                      if (resolveRes.status === "success") {
+                        // Update the invoice number field with the new ID
+                        $("#invoice_no").val(resolveRes.invoice_id);
+
+                        swal({
+                          title: "Success!",
+                          text:
+                            "Document tracking updated. New invoice number: <strong>" +
+                            resolveRes.invoice_id +
+                            "</strong>. Proceeding with invoice creation...",
+                          type: "success",
+                          html: true,
+                          timer: 2000,
+                          showConfirmButton: false,
+                        });
+
+                        // Proceed with invoice creation after a short delay
+                        setTimeout(function () {
+                          processInvoiceCreation();
+                        }, 2000);
+                      } else {
+                        swal({
+                          title: "Error!",
+                          text:
+                            resolveRes.message ||
+                            "Unable to resolve duplicate invoice.",
+                          type: "error",
+                          timer: 3000,
+                          showConfirmButton: false,
+                        });
+                      }
+                    },
+                    error: function () {
                       swal({
                         title: "Error!",
-                        text: resolveRes.message || "Unable to resolve duplicate invoice.",
+                        text: "Unable to update document tracking.",
                         type: "error",
                         timer: 3000,
                         showConfirmButton: false,
                       });
-                    }
-                  },
-                  error: function () {
-                    swal({
-                      title: "Error!",
-                      text: "Unable to update document tracking.",
-                      type: "error",
-                      timer: 3000,
-                      showConfirmButton: false,
-                    });
-                  },
-                });
-              }
-            });
+                    },
+                  });
+                }
+              },
+            );
             return;
           }
 
@@ -1144,70 +1163,82 @@ jQuery(document).ready(function () {
         success: function (checkRes) {
           if (checkRes.exists) {
             // Show confirmation dialog for duplicate invoice
-            swal({
-              title: "Duplicate Invoice Number!",
-              text:
-                "Invoice No <strong>" + invoiceNo + "</strong> already exists. This may be due to document tracking not being updated. Would you like to increment the document tracking ID and generate a new invoice number?",
-              type: "warning",
-              html: true,
-              showCancelButton: true,
-              confirmButtonText: "Yes, Update & Continue",
-              cancelButtonText: "No, Cancel",
-              closeOnConfirm: false,
-              closeOnCancel: true,
-            }, function(isConfirm) {
-              if (isConfirm) {
-                // User confirmed, resolve the duplicate
-                const paymentType = $('input[name="payment_type"]:checked').val();
-                
-                $.ajax({
-                  url: "ajax/php/sales-invoice.php",
-                  method: "POST",
-                  data: {
-                    action: "resolve_duplicate_invoice",
-                    payment_type: paymentType,
-                  },
-                  dataType: "json",
-                  success: function (resolveRes) {
-                    if (resolveRes.status === 'success') {
-                      // Update the invoice number field with the new ID
-                      $("#invoice_no").val(resolveRes.invoice_id);
-                      
-                      swal({
-                        title: "Success!",
-                        text: "Document tracking updated. New invoice number: <strong>" + resolveRes.invoice_id + "</strong>. Proceeding with invoice creation...",
-                        type: "success",
-                        html: true,
-                        timer: 2000,
-                        showConfirmButton: false,
-                      });
-                      
-                      // Proceed with invoice creation after a short delay
-                      setTimeout(function() {
-                        processInvoiceCreation();
-                      }, 2000);
-                    } else {
+            swal(
+              {
+                title: "Duplicate Invoice Number!",
+                text:
+                  "Invoice No <strong>" +
+                  invoiceNo +
+                  "</strong> already exists. This may be due to document tracking not being updated. Would you like to increment the document tracking ID and generate a new invoice number?",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonText: "Yes, Update & Continue",
+                cancelButtonText: "No, Cancel",
+                closeOnConfirm: false,
+                closeOnCancel: true,
+              },
+              function (isConfirm) {
+                if (isConfirm) {
+                  // User confirmed, resolve the duplicate
+                  const paymentType = $(
+                    'input[name="payment_type"]:checked',
+                  ).val();
+
+                  $.ajax({
+                    url: "ajax/php/sales-invoice.php",
+                    method: "POST",
+                    data: {
+                      action: "resolve_duplicate_invoice",
+                      payment_type: paymentType,
+                    },
+                    dataType: "json",
+                    success: function (resolveRes) {
+                      if (resolveRes.status === "success") {
+                        // Update the invoice number field with the new ID
+                        $("#invoice_no").val(resolveRes.invoice_id);
+
+                        swal({
+                          title: "Success!",
+                          text:
+                            "Document tracking updated. New invoice number: <strong>" +
+                            resolveRes.invoice_id +
+                            "</strong>. Proceeding with invoice creation...",
+                          type: "success",
+                          html: true,
+                          timer: 2000,
+                          showConfirmButton: false,
+                        });
+
+                        // Proceed with invoice creation after a short delay
+                        setTimeout(function () {
+                          processInvoiceCreation();
+                        }, 2000);
+                      } else {
+                        swal({
+                          title: "Error!",
+                          text:
+                            resolveRes.message ||
+                            "Unable to resolve duplicate invoice.",
+                          type: "error",
+                          timer: 3000,
+                          showConfirmButton: false,
+                        });
+                      }
+                    },
+                    error: function () {
                       swal({
                         title: "Error!",
-                        text: resolveRes.message || "Unable to resolve duplicate invoice.",
+                        text: "Unable to update document tracking.",
                         type: "error",
                         timer: 3000,
                         showConfirmButton: false,
                       });
-                    }
-                  },
-                  error: function () {
-                    swal({
-                      title: "Error!",
-                      text: "Unable to update document tracking.",
-                      type: "error",
-                      timer: 3000,
-                      showConfirmButton: false,
-                    });
-                  },
-                });
-              }
-            });
+                    },
+                  });
+                }
+              },
+            );
             return;
           }
 
@@ -1249,9 +1280,10 @@ jQuery(document).ready(function () {
         parseFloat($(this).find('input[name="arn_costs[]"]').val()) || price;
       const service_qty =
         parseFloat($(this).find('input[name="service_qty[]"]').val()) || 0;
-      const vehicle_no = $(this).find('input[name="vehicle_no[]"]').val() || '';
-      const current_km = $(this).find('input[name="current_km[]"]').val() || '';
-      const next_service_days = $(this).find('input[name="next_service_days[]"]').val() || '';
+      const vehicle_no = $(this).find('input[name="vehicle_no[]"]').val() || "";
+      const current_km = $(this).find('input[name="current_km[]"]').val() || "";
+      const next_service_days =
+        $(this).find('input[name="next_service_days[]"]').val() || "";
 
       if (code && !isNaN(totalItem) && item_id) {
         items.push({
@@ -1301,13 +1333,13 @@ jQuery(document).ready(function () {
     // Validate cash sales with credit
     const customerId = $("#customer_id").val();
     const paymentType = $("input[name='payment_type']:checked").val();
-    
+
     if (customerId == "1" && paymentType == "2") {
       $("#customer_code").focus();
       return swal({
         title: "Error!",
         text: "Cash sales customer is not allowed to create a credit invoice.",
-        type: "error", 
+        type: "error",
         showConfirmButton: true,
       });
     }
@@ -1417,7 +1449,7 @@ jQuery(document).ready(function () {
     formData.append("create", true);
     formData.append(
       "payment_type",
-      $('input[name="payment_type"]:checked').val()
+      $('input[name="payment_type"]:checked').val(),
     );
     formData.append("customer_id", $("#customer_id").val());
     formData.append("customer_name", $("#customer_name").val());
@@ -1431,7 +1463,7 @@ jQuery(document).ready(function () {
     formData.append("items", JSON.stringify(items));
     formData.append(
       "sales_type",
-      $('input[name="payment_type"]:checked').val()
+      $('input[name="payment_type"]:checked').val(),
     ); // Using payment_type as sales_type
     formData.append("company_id", $("#company_id").val() || 1); // Default to 1 if not found
     formData.append("department_id", $("#department_id").val() || 1); // Default to 1 if not found
@@ -1455,14 +1487,20 @@ jQuery(document).ready(function () {
         $(".someBlock").preloader("remove");
 
         if (res && res.status === "error") {
-          if (res.code === "INSUFFICIENT_STOCK" && Array.isArray(res.items) && res.items.length > 0) {
+          if (
+            res.code === "INSUFFICIENT_STOCK" &&
+            Array.isArray(res.items) &&
+            res.items.length > 0
+          ) {
             let details = res.items
               .map(function (item) {
                 return (
                   (item.item_code || "") +
                   (item.item_name ? " - " + item.item_name : "") +
-                  " : Requested " + (item.requested_qty || 0) +
-                  ", Available " + (item.available_qty || 0)
+                  " : Requested " +
+                  (item.requested_qty || 0) +
+                  ", Available " +
+                  (item.available_qty || 0)
                 );
               })
               .join("\n");
@@ -1552,50 +1590,64 @@ jQuery(document).ready(function () {
     }
 
     const dagItems = [];
+    let validationFailed = false;
 
     $("#dagItemsBodyInvoice")
       .find("tr")
       .not("#noDagItemRow")
       .each(function () {
-      const vehicleNo = $(this).find("td:eq(0)").text().trim();
-      const beltCategory = $(this).find("td:eq(1)").text().trim();
-      const size = $(this).find("td:eq(2)").text().trim();
-      const serialNo = $(this).find("td:eq(3)").text().trim();
-      const price = parseFloat($(this).find(".dag-price").val()) || 0;
-      const cost = parseFloat($(this).find(".dag-cost").val()) || 0;
-      const dagItemId = $(this).find(".dag-price").data("dag-item-id");
+        const vehicleNo = $(this).find("td:eq(0)").text().trim();
+        const beltCategory = $(this).find("td:eq(1)").text().trim();
+        const size = $(this).find("td:eq(2)").text().trim();
+        const serialNo = $(this).find("td:eq(3)").text().trim();
+        const jobNo = $(this).find("td:eq(4)").text().trim();
+        const price = parseFloat($(this).find(".dag-price").val()) || 0;
+        const cost = parseFloat($(this).find(".dag-cost").val()) || 0;
+        const dagItemId = $(this).find(".dag-price").data("dag-item-id");
 
-      // Validate that cost doesn't exceed price (when both are > 0)
-      if (price > 0 && cost > price) {
-        swal({
-          title: "Validation Error!",
-          text: `Cost (${cost.toFixed(2)}) cannot exceed price (${price.toFixed(
-            2
-          )}) for item: ${vehicleNo} - ${serialNo}`,
-          type: "error",
-          timer: 4000,
-          showConfirmButton: true,
+        console.log(
+          `Validating DAG Item: Vehicle ${vehicleNo}, Price: ${price}, Cost: ${cost}`,
+        );
+
+        // Validate that cost doesn't exceed price
+        if (cost > price) {
+          swal({
+            title: "Validation Error!",
+            text: `Cost (${cost.toFixed(2)}) cannot exceed price (${price.toFixed(
+              2,
+            )}) for item: ${vehicleNo} - ${serialNo}`,
+            type: "error",
+            timer: 4000,
+            showConfirmButton: true,
+          });
+          validationFailed = true;
+          return false; // Stop processing the loop
+        }
+
+        // Treat any DAG table row (except the placeholder) as a valid item
+        dagItems.push({
+          dag_item_id: dagItemId,
+          vehicle_no: vehicleNo,
+          belt_category: beltCategory,
+          size: size,
+          serial_no: serialNo,
+          job_no: jobNo,
+          price: price,
+          cost: cost,
+          qty: 1, // Always 1 for DAG items
+          total: price,
+          is_dag: true,
         });
-        return false; // Stop processing
-      }
-
-      // Treat any DAG table row (except the placeholder) as a valid item
-      dagItems.push({
-        dag_item_id: dagItemId,
-        vehicle_no: vehicleNo,
-        belt_category: beltCategory,
-        size: size,
-        serial_no: serialNo,
-        price: price,
-        cost: cost,
-        qty: 1, // Always 1 for DAG items
-        total: price,
-        is_dag: true,
       });
-    });
+
+    if (validationFailed) {
+      return; // Stop form submission
+    }
 
     // Also check DOM rows to avoid false negatives on some pages
-    const dagRowCount = $("#dagItemsBodyInvoice").find("tr").not("#noDagItemRow").length;
+    const dagRowCount = $("#dagItemsBodyInvoice")
+      .find("tr")
+      .not("#noDagItemRow").length;
 
     if (dagItems.length === 0 && dagRowCount === 0) {
       swal({
@@ -1651,7 +1703,10 @@ jQuery(document).ready(function () {
     formData.append("customer_id", customerId);
     formData.append("customer_name", customerName);
     formData.append("customer_mobile", $("#customer_mobile").val() || "");
-    formData.append("customer_vehicle_no", $("#customer_vehicle_no").val() || "");
+    formData.append(
+      "customer_vehicle_no",
+      $("#customer_vehicle_no").val() || "",
+    );
     formData.append("customer_address", $("#customer_address").val() || "");
     formData.append("department_id", $("#department_id").val() || "1");
     formData.append("invoice_no", invoiceId);
@@ -1750,7 +1805,7 @@ jQuery(document).ready(function () {
       });
       return;
     }
-    
+
     // Only check service item quantity against available (services don't have stock)
     if (isServiceItemCode && qty > availableQty) {
       swal({
@@ -1763,68 +1818,84 @@ jQuery(document).ready(function () {
       return;
     }
 
-
     // Multi-ARN allocation logic for regular items
     if (!isServiceItemCode && !isPureServiceCode) {
       // Get all available ARN rows for this item (not just the active one)
       const itemCodeMatch = code;
       const allArnRows = [];
-      
-      $(".arn-row").each(function() {
+
+      $(".arn-row").each(function () {
         const arnRow = $(this);
         const arnItemRow = arnRow.prevAll("tr.table-primary").first();
-        const arnItemCode = arnItemRow.find("td").eq(1).text().trim().split(" - ")[0];
-        
+        const arnItemCode = arnItemRow
+          .find("td")
+          .eq(1)
+          .text()
+          .trim()
+          .split(" - ")[0];
+
         if (arnItemCode === itemCodeMatch) {
           const arnQty = parseFloat(arnRow.data("qty")) || 0;
           const usedQty = parseFloat(arnRow.data("used")) || 0;
           const remainingQty = arnQty - usedQty;
-          
+
           if (remainingQty > 0) {
             allArnRows.push({
               element: arnRow,
               arnId: arnRow.data("arn-id"),
               arnQty: arnQty,
               usedQty: usedQty,
-              remainingQty: remainingQty
+              remainingQty: remainingQty,
             });
           }
         }
       });
-      
+
       // Calculate total available quantity across all ARNs
-      const totalAvailableQty = allArnRows.reduce((sum, arn) => sum + arn.remainingQty, 0);
-      
+      const totalAvailableQty = allArnRows.reduce(
+        (sum, arn) => sum + arn.remainingQty,
+        0,
+      );
+
       if (qty > totalAvailableQty) {
         swal(
           "Error!",
           `Insufficient stock! Requested: ${qty}, Available: ${totalAvailableQty}`,
-          "error"
+          "error",
         );
         return;
       }
-      
+
       // Allocate quantity across multiple ARNs if needed
       let remainingQtyToAllocate = qty;
       const allocations = [];
-      
+
       for (const arnInfo of allArnRows) {
         if (remainingQtyToAllocate <= 0) break;
-        
-        const qtyFromThisArn = Math.min(remainingQtyToAllocate, arnInfo.remainingQty);
-        
+
+        const qtyFromThisArn = Math.min(
+          remainingQtyToAllocate,
+          arnInfo.remainingQty,
+        );
+
         allocations.push({
           arnId: arnInfo.arnId,
           arnElement: arnInfo.element,
           arnQty: arnInfo.arnQty,
           usedQty: arnInfo.usedQty,
           allocatedQty: qtyFromThisArn,
-          cost: parseFloat(arnInfo.element.find("div:contains('Cost:')").text().match(/Cost:\s*([\d.,]+)/i)?.[1]?.replace(/,/g, "") || 0)
+          cost: parseFloat(
+            arnInfo.element
+              .find("div:contains('Cost:')")
+              .text()
+              .match(/Cost:\s*([\d.,]+)/i)?.[1]
+              ?.replace(/,/g, "") || 0,
+          ),
         });
-        
+
         remainingQtyToAllocate -= qtyFromThisArn;
       }
-      
+
       // Check for duplicate entries
       for (const allocation of allocations) {
         let alreadyExists = false;
@@ -1836,29 +1907,29 @@ jQuery(document).ready(function () {
             return false;
           }
         });
-        
+
         if (alreadyExists) {
           swal(
             "Warning!",
             `Item from ARN ${allocation.arnId} is already in the invoice. Please remove it first.`,
-            "warning"
+            "warning",
           );
           return;
         }
       }
-      
+
       // Add rows for each ARN allocation
       $("#noItemRow").remove();
       $("#noQuotationItemRow").remove();
       $("#noInvoiceItemRow").remove();
-      
+
       for (const allocation of allocations) {
         const arnCost = allocation.cost;
         const qtyFromArn = allocation.allocatedQty;
         let netUnitPrice = price - discount;
         if (netUnitPrice < 0) netUnitPrice = 0;
         const total = netUnitPrice * qtyFromArn;
-        
+
         const row = `
           <tr>
             <td>${code}
@@ -1888,24 +1959,28 @@ jQuery(document).ready(function () {
           </tr>
         `;
         $("#invoiceItemsBody").append(row);
-        
+
         // Update ARN used quantity
         const newUsed = allocation.usedQty + qtyFromArn;
         allocation.arnElement.data("used", newUsed);
-        allocation.arnElement.find(".arn-qty").text((allocation.arnQty - newUsed).toFixed(2));
+        allocation.arnElement
+          .find(".arn-qty")
+          .text((allocation.arnQty - newUsed).toFixed(2));
       }
-      
+
       // Clear form and recalculate
-      $("#itemCode, #itemName, #itemPrice, #itemQty, #itemDiscount, #itemSalePrice, #item_id, #item_cost_arn, #arn_no, #itemSerialNumber").val("");
+      $(
+        "#itemCode, #itemName, #itemPrice, #itemQty, #itemDiscount, #itemSalePrice, #item_id, #item_cost_arn, #arn_no, #itemSerialNumber",
+      ).val("");
       $("#available_qty").val(0);
       updateFinalTotal();
-      
+
       // Re-render items to update ARN availability
       renderPaginatedItems(1);
-      
+
       return; // Exit function after multi-ARN allocation
     }
-    
+
     // For service items and services, use single ARN logic
     const activeArn = $(".arn-row.active-arn").first();
 
@@ -1946,7 +2021,7 @@ jQuery(document).ready(function () {
       swal(
         "Warning!",
         "You have already added this item from the selected ARN to the invoice.",
-        "warning"
+        "warning",
       );
       return;
     }
@@ -1957,13 +2032,18 @@ jQuery(document).ready(function () {
 
     // Get the cost value from the form
     const cost = parseFloat($("#item_cost_arn").val()) || 0;
-    const serviceSellingPrice = parseFloat($("#serviceSellingPrice").val()) || 0;
+    const serviceSellingPrice =
+      parseFloat($("#serviceSellingPrice").val()) || 0;
 
     // Check if we have both a service and a service item selected
     const selectedServiceId = $("#service").val();
     const selectedServiceItemId = $("#service_items").val();
-    const hasService = selectedServiceId && selectedServiceId != "0" && isPureServiceCode;
-    const hasServiceItem = selectedServiceItemId && selectedServiceItemId != "0" && $("#serviceItemTable").is(":visible");
+    const hasService =
+      selectedServiceId && selectedServiceId != "0" && isPureServiceCode;
+    const hasServiceItem =
+      selectedServiceItemId &&
+      selectedServiceItemId != "0" &&
+      $("#serviceItemTable").is(":visible");
 
     // If both service (SV/) and service item (SI/) are selected, create TWO separate rows
     if (hasService && hasServiceItem) {
@@ -2000,7 +2080,8 @@ jQuery(document).ready(function () {
       $("#invoiceItemsBody").append(serviceRow);
 
       // --- ROW 2: Service Item (SI/) ---
-      const serviceItemCode = "SI/" + selectedServiceItemId.toString().padStart(4, "0");
+      const serviceItemCode =
+        "SI/" + selectedServiceItemId.toString().padStart(4, "0");
       const serviceItemName = $("#service_items option:selected").text().trim();
       // Use unit price for calculations, not the combined/multiplied serviceSellingPrice
       const serviceItemUnitPrice = unitServiceSellingPrice;
@@ -2034,11 +2115,10 @@ jQuery(document).ready(function () {
             </tr>
         `;
       $("#invoiceItemsBody").append(serviceItemRow);
-
     } else {
       // Single row - either service only, service item only, or regular item
       let total, displayPrice, displayName;
-      
+
       if (isServiceItemCode) {
         // Service item only (SI/) - use serviceSellingPrice and serviceQty
         displayPrice = effectivePrice;
@@ -2087,7 +2167,7 @@ jQuery(document).ready(function () {
     // Clear input fields
     updateFinalTotal();
     $(
-      "#itemCode, #itemName, #itemPrice,#item_cost_arn, #itemQty, #itemDiscount, #item_id, #itemSalePrice, #itemSerialNumber"
+      "#itemCode, #itemName, #itemPrice,#item_cost_arn, #itemQty, #itemDiscount, #item_id, #itemSalePrice, #itemSerialNumber",
     ).val("");
     $("#vehicleNo, #currentKm, #nextServiceDays").val("");
     // Reset service dropdowns and related fields
@@ -2161,25 +2241,25 @@ jQuery(document).ready(function () {
       subTotal.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      }),
     );
     $("#disTotal").val(
       discountTotal.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      }),
     );
     $("#tax").val(
       taxTotal.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      }),
     );
     $("#finalTotal").val(
       grandTotal.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      }),
     );
 
     $("#balanceAmount").val($("#finalTotal").val());
@@ -2353,7 +2433,7 @@ jQuery(document).ready(function () {
             }
           },
         });
-      }
+      },
     );
   });
 
@@ -2425,7 +2505,7 @@ jQuery(document).ready(function () {
                                 <td><input type="number" class="item-qty form-control form-control-sm qty" value="${qty}"></td>
                                 <td><input type="number" class="item-discount form-control form-control-sm discount" value="${discount}"></td>
                                 <td><input type="text" class="item-total form-control form-control-sm totalPrice"  value="${total.toFixed(
-                                  2
+                                  2,
                                 )}" readonly>
                                 <td><button type="button" class="btn btn-sm btn-danger btn-remove-item" onclick="removeRow(this)">Remove</button></td>
                             </tr>
@@ -2529,17 +2609,18 @@ jQuery(document).ready(function () {
                 <td>${item.belt_title || ""}</td>
                 <td>${item.size_name || ""}</td>
                 <td>${item.serial_number || ""}</td>
+                <td>${item.job_number || ""}</td>
                 <td>
                   <input type="number" class="form-control form-control-sm dag-cost" 
                          value="${
-                           item.total_amount || "0.00"
+                           item.casing_cost || "0.00"
                          }" step="0.01" min="0" 
                          data-dag-item-id="${item.id}">
                 </td>
                 <td>
                   <input type="number" class="form-control form-control-sm dag-price" 
                          value="${
-                           item.casing_cost || "0.00"
+                           item.total_amount || item.casing_cost || "0.00"
                          }" step="0.01" min="0" 
                          data-dag-item-id="${item.id}">
                 </td>
@@ -2559,7 +2640,7 @@ jQuery(document).ready(function () {
         } else {
           $("#dagItemsBodyInvoice").html(`
             <tr id="noDagItemRow">
-              <td colspan="7" class="text-center text-muted">No items found for this DAG</td>
+              <td colspan="8" class="text-center text-muted">No items found for this DAG</td>
             </tr>
           `);
         }
@@ -2572,44 +2653,13 @@ jQuery(document).ready(function () {
 
   // Handle price input changes for DAG items
   $(document).on("input", ".dag-price", function () {
-    const row = $(this).closest("tr");
-    const price = parseFloat($(this).val()) || 0;
-    const costInput = row.find(".dag-cost");
-    const cost = parseFloat(costInput.val()) || 0;
-
-    // If cost is higher than price, reset cost to price value
-    if (cost > price) {
-      costInput.val(price.toFixed(2));
-      swal({
-        title: "Warning!",
-        text: "Cost cannot exceed the selling price. Cost has been adjusted to match the price.",
-        type: "warning",
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    }
-
+    // Just recalculate totals - validation will happen on save
     calculateDagTotals();
   });
 
   // Handle cost input changes for DAG items
   $(document).on("input", ".dag-cost", function () {
-    const row = $(this).closest("tr");
-    const cost = parseFloat($(this).val()) || 0;
-    const price = parseFloat(row.find(".dag-price").val()) || 0;
-
-    // If cost exceeds price, prevent the change and show warning
-    if (cost > price) {
-      $(this).val(price.toFixed(2));
-      swal({
-        title: "Invalid Cost!",
-        text: "Cost cannot be higher than the selling price.",
-        type: "error",
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    }
-
+    // Just recalculate totals - validation will happen on save
     calculateDagTotals();
   });
 
@@ -2622,7 +2672,7 @@ jQuery(document).ready(function () {
     if ($("#dagItemsBodyInvoice tr").length === 0) {
       $("#dagItemsBodyInvoice").html(`
         <tr id="noDagItemRow">
-          <td colspan="7" class="text-center text-muted">No items added</td>
+          <td colspan="8" class="text-center text-muted">No items added</td>
         </tr>
       `);
     }
@@ -2757,7 +2807,7 @@ jQuery(document).ready(function () {
 
           // Close the modal
           const quotationModal = bootstrap.Modal.getInstance(
-            document.getElementById("quotationModel")
+            document.getElementById("quotationModel"),
           );
           if (quotationModal) {
             quotationModal.hide();

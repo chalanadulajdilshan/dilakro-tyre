@@ -412,6 +412,7 @@ jQuery(document).ready(function () {
                                    data-address="${customer.address}"
                                    data-mobile="${customer.mobile_number}"
                                    data-name="${customer.name}"
+                                   data-outstanding="${customer.outstanding}"
                                    data-name2="${customer.name_2 || ''}">
                                    ${customer.code} - ${displayName}
                                 </a>`;
@@ -462,6 +463,7 @@ jQuery(document).ready(function () {
                     var customerName2 = selectedItem.data("name2");
                     var customerAddress = selectedItem.data("address");
                     var customerMobile = selectedItem.data("mobile");
+                    var customerOutstanding = selectedItem.data("outstanding");
 
                     // Populate input fields with selected customer data
                     $("#customer_code").val(customerCode);
@@ -469,6 +471,7 @@ jQuery(document).ready(function () {
                     $("#name_2").val(customerName2);
                     $("#customer_address").val(customerAddress);
                     $("#customer_mobile").val(customerMobile);
+                    $("#outstanding").val(customerOutstanding);
 
                     // Hide the customer dropdown list
                     $("#customerList").hide();
@@ -494,6 +497,7 @@ jQuery(document).ready(function () {
         var customerName2 = $(this).data("name2");
         var customerAddress = $(this).data("address");
         var customerMobile = $(this).data("mobile");
+        var customerOutstanding = $(this).data("outstanding");
 
         // Populate the fields with the customer data
         $("#customer_code").val(customerCode);
@@ -501,6 +505,7 @@ jQuery(document).ready(function () {
         $("#name_2").val(customerName2);
         $("#customer_address").val(customerAddress);
         $("#customer_mobile").val(customerMobile);
+        $("#outstanding").val(customerOutstanding);
 
         // Hide the customer list after selection
         $("#customerList").hide();

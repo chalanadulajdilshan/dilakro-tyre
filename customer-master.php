@@ -263,6 +263,58 @@ $customer_id = 'CM/' . $_SESSION['id'] . '/0' . ($lastId + 1);
         });
     </script>
 
+    <!-- Fix Outstanding Balance Population -->
+    <script>
+        $(document).ready(function() {
+            // Bind to the modal properly to ensure we override common.js
+            $("#AllCustomerModal").on("shown.bs.modal", function() {
+                // We use a slight delay or just rely on order (common.js runs first) for the overwrite to happen
+                // Override the row click event for allCustomerTable to properly handle outstanding balance
+                $("#allCustomerTable tbody").off("click").on("click", "tr", function() {
+                    var data = $("#allCustomerTable").DataTable().row(this).data();
+                    
+                    if (data) {
+                        $("#customer_id").val(data.id || "");
+                        $("#code").val(data.code || "");
+                        $("#name").val(data.name || "");
+                        $("#name_2").val(data.name_2 || "");
+                        $("#address").val(data.address || "");
+                        $("#mobile_number").val(data.mobile_number || "");
+                        $("#mobile_number_2").val(data.mobile_number_2 || "");
+                        $("#email").val(data.email || "");
+                        $("#contact_person").val(data.contact_person || "");
+                        $("#contact_person_number").val(data.contact_person_number || "");
+                        
+                        // Checkbox (is_active)
+                        $("#is_active").prop("checked", data.status == 1);
+                        
+                        $("#credit_limit").val(data.credit_limit || "");
+                        // Parse outstanding value to remove commas and convert to number
+                        var outstandingValue = (data.outstanding || "").replace(/,/g, "");
+                        $("#outstanding").val(outstandingValue);
+                        $("#old_outstanding").val(data.old_outstanding || "");
+                        $("#overdue").val(data.overdue || "");
+                        $("#vat_no").val(data.vat_no || "");
+                        $("#svat_no").val(data.svat_no || "");
+                        
+                        // For select inputs, set value and trigger change
+                        $("#category").val(data.category_id || "").trigger("change");
+                        $("#province").val(data.province_id || "").trigger("change");
+                        $("#district").val(data.district_id || "").trigger("change");
+                        $("#vat_group").val(data.vat_group || "").trigger("change");
+                        
+                        $("#remark").val(data.remark || "");
+                        $("#create").hide();
+                        $("#update").show();
+                        
+                        // Close the modal
+                        $("#AllCustomerModal").modal("hide");
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
