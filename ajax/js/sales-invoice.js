@@ -1240,8 +1240,9 @@ jQuery(document).ready(function () {
       let qty = parseFloat($(this).find("td:eq(3)").text()) || 0;
       const discount = parseFloat($(this).find("td:eq(4)").text()) || 0;
       const selling_price = parseFloat($(this).find("td:eq(5)").text()) || 0;
+      const serial_number = $(this).find("td:eq(6)").text().trim();
 
-      const totalItem = parseFloat($(this).find("td:eq(6)").text()) || 0;
+      const totalItem = parseFloat($(this).find("td:eq(7)").text()) || 0;
       const item_id = $(this).find('input[name="item_id[]"]').val();
       const arn_no = $(this).find('input[name="arn_ids[]"]').val();
       const arn_cost =
@@ -1268,6 +1269,7 @@ jQuery(document).ready(function () {
           vehicle_no,
           current_km,
           next_service_days,
+          serial_number,
         });
       }
     });
@@ -1697,6 +1699,7 @@ jQuery(document).ready(function () {
     const price = parseFloat($("#itemPrice").val()) || 0;
     const discount = parseFloat($("#itemDiscount").val()) || 0;
     const sale_price = parseFloat($("#itemSalePrice").val()) || 0;
+    const serial_number = $("#itemSerialNumber").val().trim();
 
     let availableQty = parseFloat($("#available_qty").val()) || 0;
     let serviceQty = parseFloat($("#serviceQty").val()) || 0;
@@ -1867,12 +1870,14 @@ jQuery(document).ready(function () {
               <input type="hidden" name="vehicle_no[]" value="">
               <input type="hidden" name="current_km[]" value="">
               <input type="hidden" name="next_service_days[]" value="">
+              <input type="hidden" name="serial_numbers[]" value="${serial_number}">
             </td>
             <td>${name} (ARN: ${allocation.arnId})</td>
             <td class="item-price">${price.toFixed(2)}</td>
             <td class="item-qty">${qtyFromArn}</td>
             <td class="item-discount">${discount}</td>
             <td class="item-sell-price">${netUnitPrice.toFixed(2)}</td>
+            <td>${serial_number}</td>
             <td>${total.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -1891,7 +1896,7 @@ jQuery(document).ready(function () {
       }
       
       // Clear form and recalculate
-      $("#itemCode, #itemName, #itemPrice, #itemQty, #itemDiscount, #itemSalePrice, #item_id, #item_cost_arn, #arn_no").val("");
+      $("#itemCode, #itemName, #itemPrice, #itemQty, #itemDiscount, #itemSalePrice, #item_id, #item_cost_arn, #arn_no, #itemSerialNumber").val("");
       $("#available_qty").val(0);
       updateFinalTotal();
       
@@ -1975,12 +1980,14 @@ jQuery(document).ready(function () {
                     <input type="hidden" name="vehicle_no[]" value="${vehicleNo}">
                     <input type="hidden" name="current_km[]" value="${currentKm}">
                     <input type="hidden" name="next_service_days[]" value="${nextServiceDays}">
+                    <input type="hidden" name="serial_numbers[]" value="${serial_number}">
                 </td>
                 <td>${name}</td>
                 <td class="item-price">${price.toFixed(2)}</td>
                 <td class="item-qty">${qty}</td>
                 <td class="item-discount">${discount}</td>
                 <td class="item-sell-price">${(price - discount).toFixed(2)}</td>
+                <td>${serial_number}</td>
                 <td>${serviceTotal.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -2009,12 +2016,14 @@ jQuery(document).ready(function () {
                     <input type="hidden" name="vehicle_no[]" value="">
                     <input type="hidden" name="current_km[]" value="">
                     <input type="hidden" name="next_service_days[]" value="">
+                    <input type="hidden" name="serial_numbers[]" value="${serial_number}">
                 </td>
                 <td>${serviceItemName}</td>
                 <td class="item-price">${serviceItemUnitPrice.toFixed(2)}</td>
                 <td class="item-qty">${serviceQty}</td>
                 <td class="item-discount">0</td>
                 <td class="item-sell-price">${serviceItemUnitPrice.toFixed(2)}</td>
+                <td>${serial_number}</td>
                 <td>${serviceItemTotal.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -2055,12 +2064,14 @@ jQuery(document).ready(function () {
                     <input type="hidden" name="vehicle_no[]" value="${vehicleNo}">
                     <input type="hidden" name="current_km[]" value="${currentKm}">
                     <input type="hidden" name="next_service_days[]" value="${nextServiceDays}">
+                    <input type="hidden" name="serial_numbers[]" value="${serial_number}">
                 </td>
                 <td>${displayName}</td>
                 <td class="item-price">${displayPrice.toFixed(2)}</td>
                 <td class="item-qty">${qty}</td>
                 <td class="item-discount">${discount}</td>
                 <td class="item-sell-price">${(displayPrice - discount).toFixed(2)}</td>
+                <td>${serial_number}</td>
                 <td>${total.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -2076,7 +2087,7 @@ jQuery(document).ready(function () {
     // Clear input fields
     updateFinalTotal();
     $(
-      "#itemCode, #itemName, #itemPrice,#item_cost_arn, #itemQty, #itemDiscount, #item_id, #itemSalePrice"
+      "#itemCode, #itemName, #itemPrice,#item_cost_arn, #itemQty, #itemDiscount, #item_id, #itemSalePrice, #itemSerialNumber"
     ).val("");
     $("#vehicleNo, #currentKm, #nextServiceDays").val("");
     // Reset service dropdowns and related fields

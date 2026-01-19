@@ -143,7 +143,11 @@ class Dag
 
     public function getByCompany($companyId)
     {
-        $query = "SELECT * FROM `dag` WHERE `dag_company_id` = {$companyId} ORDER BY `received_date` DESC";
+        $query = "SELECT d.*, di.status as status, di.company_delivery_date as company_delivery_date, di.receipt_no as receipt_no 
+                  FROM `dag` d 
+                  INNER JOIN `dag_item` di ON d.id = di.dag_id 
+                  WHERE di.dag_company_id = {$companyId} 
+                  ORDER BY d.received_date DESC";
 
         $db = Database::getInstance();
         $result = $db->readQuery($query);
@@ -156,7 +160,7 @@ class Dag
         return $array_res;
     }
 
-    public function getFilteredReports($from_date, $to_date, $status = '', $dag_no = '')
+    public function getFilteredReports($from_date, $to_date, $status = '', $dag_no = '', $customer_id = '', $job_no = '')
     {
         $query = "SELECT 
                      d.*, 
@@ -164,23 +168,30 @@ class Dag
                      dept.name as department_name,
                      dc.name as company_name,
                      b.name as belt_category,
-                     di.barcode as barcode,
-                     di.vehicle_no as item_vehicle_no,
                      di.qty as qty,
-                     di.total_amount as total_amount
+                     di.total_amount as total_amount,
+                     di.serial_number as serial_number,
+                     di.job_number as job_number,
+                     di.status as status
               FROM dag d
               LEFT JOIN customer_master c ON d.customer_id = c.id
               LEFT JOIN department_master dept ON d.department_id = dept.id
-              LEFT JOIN dag_company dc ON d.dag_company_id = dc.id
               LEFT JOIN dag_item di ON d.id = di.dag_id
+              LEFT JOIN dag_company dc ON di.dag_company_id = dc.id
               LEFT JOIN belt_master b ON di.belt_id = b.id
               WHERE d.received_date BETWEEN '$from_date' AND '$to_date'";
 
         if (!empty($status)) {
-            $query .= " AND d.status = '$status'";
+            $query .= " AND di.status = '$status'";
         }
         if (!empty($dag_no)) {
             $query .= " AND d.ref_no LIKE '%$dag_no%'";
+        }
+        if (!empty($customer_id)) {
+            $query .= " AND d.customer_id = '$customer_id'";
+        }
+        if (!empty($job_no)) {
+            $query .= " AND di.job_number LIKE '%$job_no%'";
         }
 
         $query .= " ORDER BY d.received_date DESC";

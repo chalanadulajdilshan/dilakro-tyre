@@ -343,6 +343,7 @@ if (isset($_POST['create'])) {
             $SALES_ITEM->vehicle_no = isset($item['vehicle_no']) ? $item['vehicle_no'] : '';
             $SALES_ITEM->current_km = isset($item['current_km']) ? $item['current_km'] : '';
             $SALES_ITEM->next_service_date = (isset($item['next_service_days']) && !empty($item['next_service_days']) && intval($item['next_service_days']) > 0) ? date('Y-m-d', strtotime($SALES_INVOICE->invoice_date . ' + ' . $item['next_service_days'] . ' days')) : null;
+            $SALES_ITEM->serial_number = isset($item['serial_number']) ? $item['serial_number'] : '';
             $SALES_ITEM->created_at = date("Y-m-d H:i:s");
             $SALES_ITEM->create();
 

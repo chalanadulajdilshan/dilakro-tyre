@@ -294,6 +294,7 @@ $CUSTOMER = new CustomerMaster($SALES_INVOICE->customer_id);
                                                             <th>Qty</th>
                                                             <th>Discount</th>
                                                             <th>Total</th>
+                                                            <th>Serial No</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="invoiceItemsBody">
@@ -305,7 +306,7 @@ $CUSTOMER = new CustomerMaster($SALES_INVOICE->customer_id);
                                                                 <td><?php echo $item['quantity'] ?></td>
                                                                 <td><?php echo $item['discount'] ?></td>
                                                                 <td><?php echo $item['total'] ?></td>
-
+                                                                <td><?php echo $item['serial_number'] ?></td>
                                                             </tr>
                                                         <?php } ?>
                                                     </tbody>
