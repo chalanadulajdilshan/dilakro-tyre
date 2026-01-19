@@ -9,9 +9,11 @@ $from_date = isset($_GET['from_date']) ? $_GET['from_date'] : date('Y-m-01');
 $to_date = isset($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-d');
 $status = isset($_GET['status']) ? $_GET['status'] : '';
 $dag_no = isset($_GET['dag_no']) ? $_GET['dag_no'] : '';
+$customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
+$job_no = isset($_GET['job_no']) ? $_GET['job_no'] : '';
 
 // Get filtered DAG reports
-$reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_no);
+$reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_no, $customer_id, $job_no);
 ?>
 <!doctype html>
 <html lang="en">
@@ -61,7 +63,7 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                     <h4 class="card-title">Filter Options</h4>
                                     <form id="filter-form" method="get" action="">
                                         <div class="row">
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <div class="mb-3">
                                                     <label for="from_date" class="form-label">From Date</label>
                                                     <div class="input-group" id="datepicker1">
@@ -71,7 +73,7 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <div class="mb-3">
                                                     <label for="to_date" class="form-label">To Date</label>
                                                     <div class="input-group" id="datepicker2">
@@ -80,7 +82,7 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status">
@@ -91,7 +93,28 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Customer</label>
+                                                    <select class="form-select" name="customer_id">
+                                                        <option value="">All Customers</option>
+                                                        <?php
+                                                        $CUSTOMER = new CustomerMaster();
+                                                        foreach ($CUSTOMER->all() as $customer) {
+                                                            $selected = ($customer_id == $customer['id']) ? 'selected' : '';
+                                                            echo "<option value='{$customer['id']}' {$selected}>{$customer['name']}</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Job No</label>
+                                                    <input type="text" class="form-control" name="job_no" value="<?php echo htmlspecialchars($job_no) ?>" placeholder="Search Job No">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
                                                 <div class="mb-3">
                                                     <label class="form-label">DAG Number</label>
                                                     <input type="text" class="form-control" name="dag_no" value="<?php echo htmlspecialchars($dag_no) ?>">
@@ -130,10 +153,11 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                     <th>#</th>
                                                     <th>Ref No</th>
                                                     <th>Date</th>
+                                                    <th>Customer</th>
+                                                    <th>Job No</th>
+                                                    <th>Serial No</th>
                                                     <th>Company</th>
-                                                    <th>Department</th>
                                                     <th>Belt Category</th>
-                                                    <th>Barcode</th>
                                                     <th>Vehicle No</th>
                                                     <th>Qty</th>
                                                     <th>Total Amount</th>
@@ -149,10 +173,11 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                             <td><?php echo $counter++; ?></td>
                                                             <td><?php echo htmlspecialchars($report['ref_no']); ?></td>
                                                             <td><?php echo date('d/m/Y', strtotime($report['received_date'])); ?></td>
+                                                            <td><?php echo htmlspecialchars($report['customer_name']); ?></td>
+                                                            <td><?php echo htmlspecialchars($report['job_number']); ?></td>
+                                                            <td><?php echo htmlspecialchars($report['serial_number']); ?></td>
                                                             <td><?php echo htmlspecialchars($report['company_name']); ?></td>
-                                                            <td><?php echo htmlspecialchars($report['department_name']); ?></td>
                                                             <td><?php echo htmlspecialchars($report['belt_category']); ?></td>
-                                                            <td><?php echo htmlspecialchars($report['barcode']); ?></td>
                                                             <td><?php echo htmlspecialchars($report['vehicle_no']); ?></td>
                                                             <td class="text-center"><?php echo $report['qty']; ?></td>
                                                             <td class="text-end"><?php echo number_format($report['total_amount'], 2); ?></td>
@@ -175,9 +200,6 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                                 </span>
                                                             </td>
                                                             <td>
-                                                                <a href="dag-view.php?id=<?php echo $report['id']; ?>" class="btn btn-primary btn-sm">
-                                                                    <i class="mdi mdi-eye"></i>
-                                                                </a>
                                                                 <a href="dag-receipt-print.php?id=<?php echo $report['id']; ?>" target="_blank" class="btn btn-info btn-sm">
                                                                     <i class="mdi mdi-printer"></i>
                                                                 </a>
@@ -186,7 +208,7 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                                                     <?php endforeach; ?>
                                                 <?php else: ?>
                                                     <tr>
-                                                        <td colspan="12" class="text-center">No records found</td>
+                                                        <td colspan="13" class="text-center">No records found</td>
                                                     </tr>
                                                 <?php endif; ?>
                                             </tbody>
@@ -229,10 +251,6 @@ $reports = $DAG_REPORT->getFilteredReports($from_date, $to_date, $status, $dag_n
                 "buttons": ['copy', 'csv', 'excel', 'pdf', 'print']
             });
         });
-
-        function exportToExcel() {
-            window.location.href = 'ajax/export-dag-report.php?from_date=<?php echo urlencode($from_date); ?>&to_date=<?php echo urlencode($to_date); ?>&status=<?php echo urlencode($status); ?>&dag_no=<?php echo urlencode($dag_no); ?>';
-        }
 
         function printReport() {
             window.print();

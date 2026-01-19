@@ -161,22 +161,22 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                             <p class="mb-1" style="font-size:14px;"><strong>Due Date:</strong> <?php echo date('d M, Y', strtotime($SALES_INVOICE->due_date)); ?></p>
                         <?php endif; ?>
                     </div>
-                </div>
 
-                <!-- ITEM INVOICE PRINT -->
-                <?php if ($SALES_INVOICE->invoice_type == 'INV') { ?>
-                    <div class="table-responsive">
-                        <table class="table table-centered">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th colspan="4">Item Name</th>
-                                    <th>Selling Price</th>
-                                    <th>Qty</th>
-                                    <th class="text-end">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody style="font-size:13px;" class="font-bold">
+                    <!-- ITEM INVOICE PRINT -->
+                    <?php if ($SALES_INVOICE->invoice_type == 'INV') { ?>
+                        <div class="table-responsive">
+                            <table class="table table-centered">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th colspan="4">Item Name</th>
+                                        <th>Selling Price</th>
+                                        <th>Qty</th>
+                                        <th>Serial No</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size:13px;" class="font-bold">
                                 <?php
                                 $TEMP_SALES_ITEM = new SalesInvoiceItem(null);
                                 $temp_items_list = $TEMP_SALES_ITEM->getItemsByInvoiceId($invoice_id);
@@ -206,6 +206,7 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                         </td>
                                         <td><?php echo number_format($price, 2); ?></td>
                                         <td><?php echo $quantity; ?></td>
+                                        <td><?php echo $temp_items['serial_number']; ?></td>
                                         <td class="text-end"><?php echo number_format($line_total, 2); ?></td>
                                     </tr>
                                 <?php } ?>

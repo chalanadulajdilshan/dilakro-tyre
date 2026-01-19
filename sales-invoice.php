@@ -323,7 +323,7 @@ include './auth.php';
                                                     <input type="text" id="itemName" class="form-control"
                                                         placeholder="Name" readonly>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-1">
                                                     <label class="form-label">List Price</label>
                                                     <input type="number" id="itemPrice" class="form-control"
                                                         placeholder="Price" oninput="calculatePayment()">
@@ -347,6 +347,11 @@ include './auth.php';
                                                     <label class="form-label">Selling Price</label>
                                                     <input type="number" id="itemSalePrice" class="form-control" min="0"
                                                         placeholder="Sale Price" oninput="calculatePayment()">
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <label class="form-label">Serial No</label>
+                                                    <input type="text" id="itemSerialNumber" class="form-control"
+                                                        placeholder="Serial No">
                                                 </div>
                                                 <div class="col-md-1">
                                                     <button type="button" class="btn btn-success w-100"
@@ -450,13 +455,14 @@ include './auth.php';
                                                             <th>Qty</th>
                                                             <th>Discount</th>
                                                             <th>Selling Price</th>
+                                                            <th>Serial No</th>
                                                             <th>Total</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="invoiceItemsBody">
                                                         <tr id="noInvoiceItemRow">
-                                                            <td colspan="8" class="text-center text-muted">
+                                                            <td colspan="9" class="text-center text-muted">
                                                                 No items
                                                                 added</td>
                                                         </tr>
