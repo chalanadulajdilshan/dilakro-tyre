@@ -4,6 +4,9 @@
  */
 
 $(document).ready(function () {
+    // Load payment types
+    loadPaymentTypes();
+
     // Initialize DataTable for customer selection
     if ($.fn.DataTable.isDataTable('#oldOutstandingCustomerTable')) {
         $('#oldOutstandingCustomerTable').DataTable().destroy();
@@ -101,6 +104,28 @@ $(document).ready(function () {
             </div>
         `);
     });
+
+    // Load payment types
+    function loadPaymentTypes() {
+        $.ajax({
+            url: 'ajax/php/payment-type-master.php',
+            type: 'POST',
+            data: { get_active_payment_types: true },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success' && response.data) {
+                    let options = '<option value="">-- Select Payment Type --</option>';
+                    response.data.forEach(function(paymentType) {
+                        options += `<option value="${paymentType.id}">${paymentType.name}</option>`;
+                    });
+                    $('#paymentType').html(options);
+                }
+            },
+            error: function() {
+                console.error('Error loading payment types');
+            }
+        });
+    }
 
     // Load settlement data via AJAX
     function loadSettlementData() {
@@ -219,6 +244,12 @@ $(document).ready(function () {
                                     <label class="form-label">Settlement Amount</label>
                                     <input type="number" id="settlementAmount" class="form-control" step="0.01" min="0" max="${oldOutstanding}" placeholder="Enter settlement amount">
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Payment Type</label>
+                                    <select id="paymentType" class="form-select" required>
+                                        <option value="">-- Select Payment Type --</option>
+                                    </select>
+                                </div>
                                 <div class="col-12">
                                     <label class="form-label">Remarks</label>
                                     <textarea id="settlementRemarks" class="form-control" rows="3" placeholder="Enter settlement remarks"></textarea>
@@ -261,6 +292,9 @@ $(document).ready(function () {
 
         $('#settlementContainer').html(formHtml);
 
+        // Load payment types for the dropdown
+        loadPaymentTypes();
+
         // Update remaining amount when settlement amount changes
         $('#settlementAmount').on('input', function() {
             const settlementAmount = parseFloat($(this).val()) || 0;
@@ -271,6 +305,7 @@ $(document).ready(function () {
         // Handle settle button click
         $('#settleBtn').on('click', function() {
             const settlementAmount = parseFloat($('#settlementAmount').val()) || 0;
+            const paymentType = $('#paymentType').val();
             const remarks = $('#settlementRemarks').val().trim();
 
             if (settlementAmount <= 0) {
@@ -278,6 +313,16 @@ $(document).ready(function () {
                     icon: 'warning',
                     title: 'Invalid Amount',
                     text: 'Please enter a valid settlement amount',
+                    confirmButtonColor: '#3b5de7',
+                });
+                return;
+            }
+
+            if (!paymentType) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Payment Type Required',
+                    text: 'Please select a payment type',
                     confirmButtonColor: '#3b5de7',
                 });
                 return;
@@ -304,7 +349,7 @@ $(document).ready(function () {
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    performSettlement(customer.id, settlementAmount, remarks);
+                    performSettlement(customer.id, settlementAmount, paymentType, remarks);
                 }
             });
         });
@@ -322,14 +367,16 @@ $(document).ready(function () {
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    performSettlement(customer.id, oldOutstanding, 'Cleared all old outstanding');
+                    // For clear all, we'll use payment type 1 (cash) by default
+                    // or you could ask user to select payment type
+                    performSettlement(customer.id, oldOutstanding, 1, 'Cleared all old outstanding');
                 }
             });
         });
     }
 
     // Perform settlement
-    function performSettlement(customerId, amount, remarks) {
+    function performSettlement(customerId, amount, paymentType, remarks) {
         $.ajax({
             url: 'ajax/php/old-outstanding-settlement.php',
             type: 'POST',
@@ -338,6 +385,7 @@ $(document).ready(function () {
                 action: 'settle_old_outstanding',
                 customer_id: customerId,
                 amount: amount,
+                payment_type: paymentType,
                 remarks: remarks
             },
             beforeSend: function() {

@@ -55,9 +55,10 @@ try {
     } elseif ($action === 'settle_old_outstanding') {
         $customerId = $_POST['customer_id'] ?? '';
         $amount = $_POST['amount'] ?? '';
+        $paymentType = $_POST['payment_type'] ?? '';
         $remarks = $_POST['remarks'] ?? '';
 
-        if (empty($customerId) || !is_numeric($amount) || $amount <= 0) {
+        if (empty($customerId) || !is_numeric($amount) || $amount <= 0 || empty($paymentType)) {
             throw new Exception('Invalid input parameters');
         }
 
@@ -93,14 +94,30 @@ try {
             $updateStmt->bind_param('di', $newOutstanding, $customerId);
             $updateStmt->execute();
 
-            // Log the settlement (you might want to create a settlement log table)
-            // For now, we'll just update the amount
+            // Add to cashbook if payment type is cash (ID = 1)
+            if ($paymentType == 1) {
+                include_once '../../class/Cashbook.php';
+                
+                $CASHBOOK = new Cashbook();
+                $CASHBOOK->ref_no = 'OOS/' . date('Y') . '/' . str_pad($customerId, 5, '0', STR_PAD_LEFT);
+                $CASHBOOK->transaction_type = 'deposit'; // Cash coming in
+                $CASHBOOK->bank_id = 0; // Not applicable for cash
+                $CASHBOOK->branch_id = 0; // Not applicable for cash
+                $CASHBOOK->amount = $amount;
+                $CASHBOOK->remark = "Old Outstanding Settlement - Customer ID: {$customerId}, Remarks: {$remarks}";
+                
+                $cashbookResult = $CASHBOOK->create();
+                if (!$cashbookResult) {
+                    throw new Exception('Failed to record transaction in cashbook');
+                }
+            }
 
             $db->DB_CON->commit();
 
+            $cashbookMessage = ($paymentType == 1) ? ' and recorded in cashbook' : '';
             $response = [
                 'status' => 'success',
-                'message' => 'Old outstanding settled successfully. Remaining amount: ' . number_format($newOutstanding, 2),
+                'message' => 'Old outstanding settled successfully' . $cashbookMessage . '. Remaining amount: ' . number_format($newOutstanding, 2),
                 'data' => ['remaining_outstanding' => $newOutstanding]
             ];
 

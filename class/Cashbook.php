@@ -124,6 +124,7 @@ class Cashbook
     LEFT JOIN branches br ON ct.branch_id = br.id
     WHERE ct.created_at BETWEEN '$dateFrom' AND '$dateTo'
     AND (ct.remark NOT LIKE 'Supplier Payment%' OR ct.remark IS NULL)
+    AND ct.ref_no NOT LIKE 'OOS/%'
     ORDER BY ct.created_at DESC
 ";
  
@@ -538,6 +539,28 @@ class Cashbook
             ];
         }
 
+        // Old Outstanding Settlement payments (cash coming IN from customers)
+        $whereOOS = str_replace('invoice_date', 'ct.created_at', $where);
+        $query = "SELECT ct.created_at as date, ct.ref_no as doc, ct.amount, ct.remark as description
+                  FROM cashbook_transactions ct
+                  $whereOOS AND ct.ref_no LIKE 'OOS/%'
+                  ORDER BY ct.created_at ASC";
+        $result = $db->readQuery($query);
+        while ($row = mysqli_fetch_array($result)) {
+            $runningBalance += (float)$row['amount'];
+            $transactions[] = [
+                'date' => date('Y-m-d H:i:s', strtotime($row['date'])),
+                'account_type' => 'CASH',
+                'transaction' => 'IN',
+                'description' => $row['description'],
+                'doc' => $row['doc'],
+                'debit' => number_format($row['amount'], 2),
+                'credit' => '0.00',
+                'balance' => number_format($runningBalance, 2),
+                'sort_date' => $row['date']
+            ];
+        }
+
         // Bank deposits
         $whereDeposit = str_replace('invoice_date', 'ct.created_at', $where);
         $query = "SELECT ct.created_at as date, ct.ref_no as doc, ct.amount, 
@@ -545,7 +568,7 @@ class Cashbook
                   FROM cashbook_transactions ct
                   LEFT JOIN banks b ON ct.bank_id = b.id
                   LEFT JOIN branches br ON ct.branch_id = br.id
-                  $whereDeposit AND ct.transaction_type = 'deposit'
+                  $whereDeposit AND ct.transaction_type = 'deposit' AND ct.ref_no NOT LIKE 'OOS/%'
                   ORDER BY ct.created_at ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {

@@ -3,6 +3,18 @@
 include '../../class/include.php';
 header('Content-Type: application/json; charset=UTF8');
 
+// Get active payment types for dropdown
+if (isset($_POST['get_active_payment_types'])) {
+    $PAYMENT_TYPE = new PaymentType(null);
+    $paymentTypes = $PAYMENT_TYPE->getActivePaymentType();
+    
+    echo json_encode([
+        'status' => 'success',
+        'data' => $paymentTypes
+    ]);
+    exit();
+}
+
 // Create a new payment
 if (isset($_POST['create'])) {
    
