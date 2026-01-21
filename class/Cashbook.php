@@ -110,9 +110,9 @@ class Cashbook
     public function getByDate($dateFrom, $dateTo)
     {
         $dateFrom = $dateFrom . " 00:00:00";
-        $dateTo = $dateTo . " 23:59:59";
+        $dateTo   = $dateTo . " 23:59:59";
 
-
+        
 
         $query = "
     SELECT 
@@ -124,10 +124,9 @@ class Cashbook
     LEFT JOIN branches br ON ct.branch_id = br.id
     WHERE ct.created_at BETWEEN '$dateFrom' AND '$dateTo'
     AND (ct.remark NOT LIKE 'Supplier Payment%' OR ct.remark IS NULL)
-    AND ct.ref_no NOT LIKE 'OOS/%'
     ORDER BY ct.created_at DESC
 ";
-
+ 
         $db = Database::getInstance();
         $result = $db->readQuery($query);
 
@@ -174,14 +173,14 @@ class Cashbook
 
         if ($dateFrom && $dateTo) {
             $dateFrom = mysqli_real_escape_string($db->DB_CON, $dateFrom);
-            $dateTo = mysqli_real_escape_string($db->DB_CON, $dateTo);
-            $where .= " AND DATE(si.invoice_date) BETWEEN '$dateFrom' AND '$dateTo'";
+            $dateTo   = mysqli_real_escape_string($db->DB_CON, $dateTo);
+            $where   .= " AND DATE(si.invoice_date) BETWEEN '$dateFrom' AND '$dateTo'";
         } elseif ($dateTo) {
             $dateTo = mysqli_real_escape_string($db->DB_CON, $dateTo);
             $where .= " AND DATE(si.invoice_date) <= '$dateTo'";
         } elseif ($dateFrom) {
             $dateFrom = mysqli_real_escape_string($db->DB_CON, $dateFrom);
-            $where .= " AND DATE(si.invoice_date) >= '$dateFrom'";
+            $where   .= " AND DATE(si.invoice_date) >= '$dateFrom'";
         }
 
         // Cash from sales invoices (payment_type = 1 means cash)
@@ -190,13 +189,6 @@ class Cashbook
                               $where AND si.payment_type = 1 AND si.is_cancel = 0";
         $resultCash = mysqli_fetch_array($db->readQuery($queryCashInvoices));
         $totalCashInvoices = (float) $resultCash['total'];
-
-        // Cash from credit sale advance payments (paid amount when creating credit sales)
-        $queryCreditAdvance = "SELECT COALESCE(SUM(outstanding_settle_amount), 0) as total 
-                              FROM `sales_invoice` si
-                              $where AND si.payment_type = 2 AND si.is_cancel = 0 AND si.outstanding_settle_amount > 0";
-        $resultCreditAdvance = mysqli_fetch_array($db->readQuery($queryCreditAdvance));
-        $totalCreditAdvance = (float) $resultCreditAdvance['total'];
 
         // Cash from payment receipts (customer payments)
         $wherePayment = str_replace('si.invoice_date', 'pr.entry_date', $where);
@@ -215,7 +207,7 @@ class Cashbook
         $resultIncome = mysqli_fetch_array($db->readQuery($queryDailyIncome));
         $totalDailyIncome = (float) $resultIncome['total'];
 
-        return $totalCashInvoices + $totalCreditAdvance + $totalPaymentReceipts + $totalDailyIncome;
+        return $totalCashInvoices + $totalPaymentReceipts + $totalDailyIncome;
     }
 
     // Get total cash OUT from various sources
@@ -228,14 +220,14 @@ class Cashbook
 
         if ($dateFrom && $dateTo) {
             $dateFrom = mysqli_real_escape_string($db->DB_CON, $dateFrom);
-            $dateTo = mysqli_real_escape_string($db->DB_CON, $dateTo);
-            $where .= " AND DATE(e.expense_date) BETWEEN '$dateFrom' AND '$dateTo'";
+            $dateTo   = mysqli_real_escape_string($db->DB_CON, $dateTo);
+            $where   .= " AND DATE(e.expense_date) BETWEEN '$dateFrom' AND '$dateTo'";
         } elseif ($dateTo) {
             $dateTo = mysqli_real_escape_string($db->DB_CON, $dateTo);
             $where .= " AND DATE(e.expense_date) <= '$dateTo'";
         } elseif ($dateFrom) {
             $dateFrom = mysqli_real_escape_string($db->DB_CON, $dateFrom);
-            $where .= " AND DATE(e.expense_date) >= '$dateFrom'";
+            $where   .= " AND DATE(e.expense_date) >= '$dateFrom'";
         }
 
         // Cash from expenses
@@ -300,7 +292,7 @@ class Cashbook
 
         // Get the last transaction's balance
         $lastTransaction = end($transactions);
-        $balance = (float) str_replace(',', '', $lastTransaction['balance']);
+        $balance = (float)str_replace(',', '', $lastTransaction['balance']);
 
         return $balance;
     }
@@ -335,7 +327,7 @@ class Cashbook
                 if (!empty($prevDayTransactions)) {
                     // Get the last transaction's balance (which is the closing balance)
                     $lastTransaction = end($prevDayTransactions);
-                    $openingBalance = (float) str_replace(',', '', $lastTransaction['balance']);
+                    $openingBalance = (float)str_replace(',', '', $lastTransaction['balance']);
                 }
             }
             // If selected date IS the first transaction date, opening = company opening (no change)
@@ -371,29 +363,7 @@ class Cashbook
                   ORDER BY invoice_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance += (float) $row['amount'];
-            $transactions[] = [
-                'date' => date('Y-m-d', strtotime($row['date'])),
-                'account_type' => 'CASH',
-                'transaction' => 'IN',
-                'description' => $row['description'],
-                'doc' => $row['doc'],
-                'debit' => number_format($row['amount'], 2),
-                'credit' => '0.00',
-                'balance' => number_format($runningBalance, 2),
-                'sort_date' => $row['date']
-            ];
-        }
-
-        // Credit sale advance payments (paid amount when creating a credit sale)
-        $query = "SELECT invoice_date as date, invoice_no as doc, outstanding_settle_amount as amount, 
-                  CONCAT('Credit Sale Advance - ', customer_name) as description
-                  FROM sales_invoice 
-                  $where AND payment_type = 2 AND is_cancel = 0 AND outstanding_settle_amount > 0
-                  ORDER BY invoice_date ASC";
-        $result = $db->readQuery($query);
-        while ($row = mysqli_fetch_array($result)) {
-            $runningBalance += (float) $row['amount'];
+            $runningBalance += (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -426,7 +396,7 @@ class Cashbook
                   ORDER BY pr.entry_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance += (float) $row['amount'];
+            $runningBalance += (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -448,7 +418,7 @@ class Cashbook
                   ORDER BY date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance += (float) $row['amount'];
+            $runningBalance += (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -472,7 +442,7 @@ class Cashbook
                   ORDER BY sr.return_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance -= (float) $row['amount'];
+            $runningBalance -= (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -496,7 +466,7 @@ class Cashbook
                   ORDER BY e.expense_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance -= (float) $row['amount'];
+            $runningBalance -= (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -522,7 +492,7 @@ class Cashbook
                   ORDER BY am.entry_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance -= (float) $row['amount'];
+            $runningBalance -= (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -554,7 +524,7 @@ class Cashbook
                   ORDER BY prs.entry_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance -= (float) $row['amount'];
+            $runningBalance -= (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -568,28 +538,6 @@ class Cashbook
             ];
         }
 
-        // Old Outstanding Settlement payments (cash coming IN from customers)
-        $whereOOS = str_replace('invoice_date', 'ct.created_at', $where);
-        $query = "SELECT ct.created_at as date, ct.ref_no as doc, ct.amount, ct.remark as description
-                  FROM cashbook_transactions ct
-                  $whereOOS AND ct.ref_no LIKE 'OOS/%'
-                  ORDER BY ct.created_at ASC";
-        $result = $db->readQuery($query);
-        while ($row = mysqli_fetch_array($result)) {
-            $runningBalance += (float) $row['amount'];
-            $transactions[] = [
-                'date' => date('Y-m-d H:i:s', strtotime($row['date'])),
-                'account_type' => 'CASH',
-                'transaction' => 'IN',
-                'description' => $row['description'],
-                'doc' => $row['doc'],
-                'debit' => number_format($row['amount'], 2),
-                'credit' => '0.00',
-                'balance' => number_format($runningBalance, 2),
-                'sort_date' => $row['date']
-            ];
-        }
-
         // Bank deposits
         $whereDeposit = str_replace('invoice_date', 'ct.created_at', $where);
         $query = "SELECT ct.created_at as date, ct.ref_no as doc, ct.amount, 
@@ -597,11 +545,11 @@ class Cashbook
                   FROM cashbook_transactions ct
                   LEFT JOIN banks b ON ct.bank_id = b.id
                   LEFT JOIN branches br ON ct.branch_id = br.id
-                  $whereDeposit AND ct.transaction_type = 'deposit' AND ct.ref_no NOT LIKE 'OOS/%'
+                  $whereDeposit AND ct.transaction_type = 'deposit'
                   ORDER BY ct.created_at ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance -= (float) $row['amount'];
+            $runningBalance -= (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d H:i:s', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -632,7 +580,7 @@ class Cashbook
                   ORDER BY ct.created_at ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance -= (float) $row['amount'];
+            $runningBalance -= (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d H:i:s', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -655,8 +603,8 @@ class Cashbook
         $runningBalance = $openingBalance;
         foreach ($transactions as &$transaction) {
             // Get the debit and credit amounts (remove formatting)
-            $debit = (float) str_replace(',', '', $transaction['debit']);
-            $credit = (float) str_replace(',', '', $transaction['credit']);
+            $debit = (float)str_replace(',', '', $transaction['debit']);
+            $credit = (float)str_replace(',', '', $transaction['credit']);
 
             // Update running balance
             $runningBalance += $debit - $credit;
