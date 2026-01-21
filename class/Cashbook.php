@@ -184,19 +184,12 @@ class Cashbook
             $where .= " AND DATE(si.invoice_date) >= '$dateFrom'";
         }
 
-        // Cash from sales invoices (payment_type = 1 means cash, but only those with cash payment methods only)
-        $queryCashInvoices = "SELECT COALESCE(SUM(si.grand_total), 0) as total 
+        // Cash from sales invoices (payment_type = 1 means cash)
+        $queryCashInvoices = "SELECT COALESCE(SUM(grand_total), 0) as total 
                               FROM `sales_invoice` si
-                              LEFT JOIN invoice_payments ip ON si.id = ip.invoice_id
-                              LEFT JOIN payment_type pt ON ip.method_id = pt.id
-                              $where AND si.payment_type = 1 AND si.is_cancel = 0
-                              GROUP BY si.id
-                              HAVING SUM(CASE WHEN LOWER(pt.name) NOT LIKE '%cash%' THEN 1 ELSE 0 END) = 0";
-        $resultCash = $db->readQuery($queryCashInvoices);
-        $totalCashInvoices = 0;
-        while ($row = mysqli_fetch_array($resultCash)) {
-            $totalCashInvoices += (float) $row['total'];
-        }
+                              $where AND si.payment_type = 1 AND si.is_cancel = 0";
+        $resultCash = mysqli_fetch_array($db->readQuery($queryCashInvoices));
+        $totalCashInvoices = (float) $resultCash['total'];
 
         // Cash from credit sale advance payments (paid amount when creating credit sales)
         $queryCreditAdvance = "SELECT COALESCE(SUM(outstanding_settle_amount), 0) as total 
@@ -312,22 +305,6 @@ class Cashbook
         return $balance;
     }
 
-    // Helper method to check if a cash invoice has only cash payment methods
-    public function hasOnlyCashPaymentMethod($invoiceId)
-    {
-        $query = "SELECT COUNT(*) as non_cash_count 
-                  FROM invoice_payments ip
-                  INNER JOIN payment_type pt ON ip.method_id = pt.id
-                  WHERE ip.invoice_id = " . (int)$invoiceId . " 
-                  AND LOWER(pt.name) NOT LIKE '%cash%'";
-        
-        $db = Database::getInstance();
-        $result = mysqli_fetch_array($db->readQuery($query));
-        
-        // If non_cash_count is 0, it means all payment methods are cash
-        return ($result['non_cash_count'] == 0);
-    }
-
     // Get all transactions with details
     public function getAllTransactionsDetailed($dateFrom = null, $dateTo = null)
     {
@@ -387,15 +364,11 @@ class Cashbook
             $where .= " AND DATE(invoice_date) BETWEEN '$dateFrom' AND '$dateTo'";
         }
 
-        // Cash sales invoices (only those with cash payment methods only)
-        $query = "SELECT si.invoice_date as date, si.invoice_no as doc, si.grand_total as amount, 'Cash Sale' as description
-                  FROM sales_invoice si
-                  LEFT JOIN invoice_payments ip ON si.id = ip.invoice_id
-                  LEFT JOIN payment_type pt ON ip.method_id = pt.id
-                  $where AND si.payment_type = 1 AND si.is_cancel = 0
-                  GROUP BY si.id
-                  HAVING SUM(CASE WHEN LOWER(pt.name) NOT LIKE '%cash%' THEN 1 ELSE 0 END) = 0
-                  ORDER BY si.invoice_date ASC";
+        // Cash sales invoices
+        $query = "SELECT invoice_date as date, invoice_no as doc, grand_total as amount, 'Cash Sale' as description
+                  FROM sales_invoice 
+                  $where AND payment_type = 1 AND is_cancel = 0
+                  ORDER BY invoice_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
             $runningBalance += (float) $row['amount'];
