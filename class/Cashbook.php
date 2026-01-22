@@ -183,14 +183,10 @@ class Cashbook
             $where   .= " AND DATE(si.invoice_date) >= '$dateFrom'";
         }
 
-        // Cash from invoice payments (method_id = 1 means cash) for cash invoices only
-        $queryCashInvoices = "SELECT COALESCE(SUM(si.grand_total), 0) as total 
+        // Cash from sales invoices (payment_type = 1 means cash)
+        $queryCashInvoices = "SELECT COALESCE(SUM(grand_total), 0) as total 
                               FROM `sales_invoice` si
-                              $where AND si.payment_type = 1 AND si.is_cancel = 0
-                              AND EXISTS (
-                                  SELECT 1 FROM `invoice_payments` ip 
-                                  WHERE ip.invoice_id = si.id AND ip.method_id = 1
-                              )";
+                              $where AND si.payment_type = 1 AND si.is_cancel = 0";
         $resultCash = mysqli_fetch_array($db->readQuery($queryCashInvoices));
         $totalCashInvoices = (float) $resultCash['total'];
 
@@ -368,17 +364,11 @@ class Cashbook
             $where .= " AND DATE(invoice_date) BETWEEN '$dateFrom' AND '$dateTo'";
         }
 
-        // Cash invoice payments (method_id = 1) for invoices marked cash
-        $query = "SELECT 
-                        COALESCE(MAX(ip.created_at), si.invoice_date) as date,
-                        si.invoice_no as doc,
-                        si.grand_total as amount,
-                        CONCAT('Cash Payment - Invoice ', si.invoice_no) as description
-                  FROM invoice_payments ip
-                  INNER JOIN sales_invoice si ON ip.invoice_id = si.id
-                  $where AND si.payment_type = 1 AND si.is_cancel = 0 AND ip.method_id = 1
-                  GROUP BY si.id, si.invoice_no, si.invoice_date, si.grand_total
-                  ORDER BY COALESCE(MAX(ip.created_at), si.invoice_date) ASC";
+        // Cash sales invoices
+        $query = "SELECT invoice_date as date, invoice_no as doc, grand_total as amount, 'Cash Sale' as description
+                  FROM sales_invoice 
+                  $where AND payment_type = 1 AND is_cancel = 0
+                  ORDER BY invoice_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
             $runningBalance += (float)$row['amount'];
@@ -486,8 +476,7 @@ class Cashbook
                   ORDER BY sr.return_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $amount = abs((float)$row['amount']);
-            $runningBalance -= $amount;
+            $runningBalance -= (float)$row['amount'];
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -495,7 +484,7 @@ class Cashbook
                 'description' => $row['description'],
                 'doc' => $row['doc'],
                 'debit' => '0.00',
-                'credit' => number_format($amount, 2),
+                'credit' => number_format($row['amount'], 2),
                 'balance' => number_format($runningBalance, 2),
                 'sort_date' => $row['date']
             ];
