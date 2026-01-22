@@ -486,7 +486,8 @@ class Cashbook
                   ORDER BY sr.return_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
-            $runningBalance -= (float)$row['amount'];
+            $amount = abs((float)$row['amount']);
+            $runningBalance -= $amount;
             $transactions[] = [
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'account_type' => 'CASH',
@@ -494,7 +495,7 @@ class Cashbook
                 'description' => $row['description'],
                 'doc' => $row['doc'],
                 'debit' => '0.00',
-                'credit' => number_format($row['amount'], 2),
+                'credit' => number_format($amount, 2),
                 'balance' => number_format($runningBalance, 2),
                 'sort_date' => $row['date']
             ];
