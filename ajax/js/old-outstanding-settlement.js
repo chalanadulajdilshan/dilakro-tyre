@@ -356,6 +356,18 @@ $(document).ready(function () {
 
         // Handle clear button click
         $('#clearBtn').on('click', function() {
+            const selectedPaymentType = $('#paymentType').val();
+
+            if (!selectedPaymentType) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Payment Type Required',
+                    text: 'Please select a payment type before clearing old outstanding',
+                    confirmButtonColor: '#3b5de7',
+                });
+                return;
+            }
+
             Swal.fire({
                 title: 'Clear All Old Outstanding',
                 text: 'Are you sure you want to clear all old outstanding amount for this customer?',
@@ -367,9 +379,7 @@ $(document).ready(function () {
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // For clear all, we'll use payment type 1 (cash) by default
-                    // or you could ask user to select payment type
-                    performSettlement(customer.id, oldOutstanding, 1, 'Cleared all old outstanding');
+                    performSettlement(customer.id, oldOutstanding, selectedPaymentType, 'Cleared all old outstanding');
                 }
             });
         });

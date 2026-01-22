@@ -207,7 +207,15 @@ class Cashbook
         $resultIncome = mysqli_fetch_array($db->readQuery($queryDailyIncome));
         $totalDailyIncome = (float) $resultIncome['total'];
 
-        return $totalCashInvoices + $totalPaymentReceipts + $totalDailyIncome;
+        // Cash from old outstanding settlements (only cash payments)
+        $whereSettlement = str_replace('si.invoice_date', 'oos.settlement_date', $where);
+        $querySettlement = "SELECT COALESCE(SUM(amount), 0) as total 
+                           FROM `old_outstanding_settlement` oos
+                           $whereSettlement AND oos.payment_type_id = 1";
+        $resultSettlement = mysqli_fetch_array($db->readQuery($querySettlement));
+        $totalSettlement = (float) $resultSettlement['total'];
+
+        return $totalCashInvoices + $totalPaymentReceipts + $totalDailyIncome + $totalSettlement;
     }
 
     // Get total cash OUT from various sources
@@ -416,6 +424,32 @@ class Cashbook
                   FROM daily_income
                   $whereIncome
                   ORDER BY date ASC";
+        $result = $db->readQuery($query);
+        while ($row = mysqli_fetch_array($result)) {
+            $runningBalance += (float)$row['amount'];
+            $transactions[] = [
+                'date' => date('Y-m-d', strtotime($row['date'])),
+                'account_type' => 'CASH',
+                'transaction' => 'IN',
+                'description' => $row['description'],
+                'doc' => $row['doc'],
+                'debit' => number_format($row['amount'], 2),
+                'credit' => '0.00',
+                'balance' => number_format($runningBalance, 2),
+                'sort_date' => $row['date']
+            ];
+        }
+
+        // Old outstanding settlements (cash IN from customers)
+        $whereSettlement = str_replace('invoice_date', 'oos.settlement_date', $where);
+        $query = "SELECT oos.settlement_date as date, 
+                         CONCAT('OOS/', YEAR(oos.settlement_date), '/', LPAD(oos.customer_id, 5, '0')) as doc, 
+                         oos.amount,
+                         CONCAT('Old Outstanding Settlement - Customer ID: ', oos.customer_id, 
+                                CASE WHEN oos.remarks IS NOT NULL AND oos.remarks != '' THEN CONCAT(', Remarks: ', oos.remarks) ELSE '' END) as description
+                  FROM old_outstanding_settlement oos
+                  $whereSettlement AND oos.payment_type_id = 1
+                  ORDER BY oos.settlement_date ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
             $runningBalance += (float)$row['amount'];

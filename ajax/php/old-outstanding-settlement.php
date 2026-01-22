@@ -94,30 +94,20 @@ try {
             $updateStmt->bind_param('di', $newOutstanding, $customerId);
             $updateStmt->execute();
 
-            // Add to cashbook if payment type is cash (ID = 1)
-            if ($paymentType == 1) {
-                include_once '../../class/Cashbook.php';
-                
-                $CASHBOOK = new Cashbook();
-                $CASHBOOK->ref_no = 'OOS/' . date('Y') . '/' . str_pad($customerId, 5, '0', STR_PAD_LEFT);
-                $CASHBOOK->transaction_type = 'deposit'; // Cash coming in
-                $CASHBOOK->bank_id = 0; // Not applicable for cash
-                $CASHBOOK->branch_id = 0; // Not applicable for cash
-                $CASHBOOK->amount = $amount;
-                $CASHBOOK->remark = "Old Outstanding Settlement - Customer ID: {$customerId}, Remarks: {$remarks}";
-                
-                $cashbookResult = $CASHBOOK->create();
-                if (!$cashbookResult) {
-                    throw new Exception('Failed to record transaction in cashbook');
-                }
+            // Record settlement for cash IN tracking (only if payment type is cash)
+            if ((int)$paymentType === 1) {
+                $settlementQuery = "INSERT INTO old_outstanding_settlement (customer_id, amount, payment_type_id, remarks, settlement_date) 
+                                   VALUES (?, ?, ?, ?, NOW())";
+                $settlementStmt = $db->DB_CON->prepare($settlementQuery);
+                $settlementStmt->bind_param('idis', $customerId, $amount, $paymentType, $remarks);
+                $settlementStmt->execute();
             }
 
             $db->DB_CON->commit();
 
-            $cashbookMessage = ($paymentType == 1) ? ' and recorded in cashbook' : '';
             $response = [
                 'status' => 'success',
-                'message' => 'Old outstanding settled successfully' . $cashbookMessage . '. Remaining amount: ' . number_format($newOutstanding, 2),
+                'message' => 'Old outstanding settled successfully. Remaining amount: ' . number_format($newOutstanding, 2),
                 'data' => ['remaining_outstanding' => $newOutstanding]
             ];
 
