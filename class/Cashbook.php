@@ -186,13 +186,9 @@ class Cashbook
         // Cash from invoice payments (method_id = 1 means cash) for cash invoices only
         $whereInvoicePayment = str_replace('si.invoice_date', 'ip.created_at', $where);
         $queryCashInvoices = "SELECT COALESCE(SUM(ip.amount), 0) as total 
-                              FROM (
-                                  SELECT ip.id, ip.amount
-                                  FROM `invoice_payments` ip
-                                  INNER JOIN `sales_invoice` si ON ip.invoice_id = si.id
-                                  $whereInvoicePayment AND si.payment_type = 1 AND si.is_cancel = 0 AND ip.method_id = 1
-                                  GROUP BY ip.id, ip.amount
-                              ) AS ip";
+                              FROM `invoice_payments` ip
+                              INNER JOIN `sales_invoice` si ON ip.invoice_id = si.id
+                              $whereInvoicePayment AND si.payment_type = 1 AND si.is_cancel = 0 AND ip.method_id = 1";
         $resultCash = mysqli_fetch_array($db->readQuery($queryCashInvoices));
         $totalCashInvoices = (float) $resultCash['total'];
 
@@ -372,15 +368,15 @@ class Cashbook
 
         // Cash invoice payments (method_id = 1) for invoices marked cash
         $query = "SELECT 
-                        COALESCE(ip.created_at, si.invoice_date) as date,
+                        COALESCE(MAX(ip.created_at), si.invoice_date) as date,
                         si.invoice_no as doc,
-                        ip.amount,
+                        SUM(ip.amount) as amount,
                         CONCAT('Cash Payment - Invoice ', si.invoice_no) as description
                   FROM invoice_payments ip
                   INNER JOIN sales_invoice si ON ip.invoice_id = si.id
                   $where AND si.payment_type = 1 AND si.is_cancel = 0 AND ip.method_id = 1
-                  GROUP BY ip.id, ip.amount, ip.created_at, si.invoice_date, si.invoice_no
-                  ORDER BY COALESCE(ip.created_at, si.invoice_date) ASC";
+                  GROUP BY si.id, si.invoice_no, si.invoice_date
+                  ORDER BY COALESCE(MAX(ip.created_at), si.invoice_date) ASC";
         $result = $db->readQuery($query);
         while ($row = mysqli_fetch_array($result)) {
             $runningBalance += (float)$row['amount'];
