@@ -177,11 +177,14 @@ if (isset($_POST['create'])) {
             $final_cost += $final_cost_item;
         } else if (substr($item['code'], 0, 2) === 'SI') {
             $SERVICE_ITEM = new ServiceItem($item['item_id']);
-            // Do not include cost for service items when invoicing
-            $final_cost_item = 0;
+            $service_cost = isset($item['cost']) ? (float)$item['cost'] : (float)$SERVICE_ITEM->cost;
+            $service_qty = !empty($item['service_qty']) ? $item['service_qty'] : $item['qty'];
+
+            // include service item cost in invoice costing
+            $final_cost_item = $service_cost * $service_qty;
             $final_cost += $final_cost_item;
 
-            $available_qty = $SERVICE_ITEM->qty - $item['service_qty'];
+            $available_qty = $SERVICE_ITEM->qty - $service_qty;
             $SERVICE_ITEM->qty = $available_qty;
             $SERVICE_ITEM->update();
         } else if (substr($item['code'], 0, 2) === 'SV') {
@@ -336,8 +339,16 @@ if (isset($_POST['create'])) {
             $SALES_ITEM->item_name = $item['code'] . '|' . $item['name'] . '|ARN:' . $arn_id . '|DEPT:' . $correctDepartmentId;
             $SALES_ITEM->list_price = $item['price']; // Save the original list price
             $SALES_ITEM->price = $item['selling_price']; // Save the actual selling price (price after discount per unit)
-            // Services (SI/SV) should not have cost stored
-            $SALES_ITEM->cost = (substr($item['code'], 0, 2) === 'SV' || substr($item['code'], 0, 2) === 'SI') ? 0 : $item['cost'];
+
+            if (substr($item['code'], 0, 2) === 'SI') {
+                // Persist service item cost (not list price)
+                $service_cost = isset($item['cost']) ? (float)$item['cost'] : (float)(new ServiceItem($item['item_id']))->cost;
+                $SALES_ITEM->cost = $service_cost;
+            } else if (substr($item['code'], 0, 2) === 'SV') {
+                $SALES_ITEM->cost = 0;
+            } else {
+                $SALES_ITEM->cost = $item['cost'];
+            }
             $SALES_ITEM->discount = $item_discount_amount;
             $SALES_ITEM->total = ($item['selling_price'] * $qty_for_total);
             $SALES_ITEM->vehicle_no = isset($item['vehicle_no']) ? $item['vehicle_no'] : '';
