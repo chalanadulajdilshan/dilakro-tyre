@@ -212,6 +212,27 @@ jQuery(document).ready(function () {
         $("#supplier_code").val(data.code);
         $("#supplier_name").val(data.name);
         $("#supplier_address").val(data.address);
+
+        // If the supplier master form exists, populate it so back-selection works there too
+        if ($("#form-data").length) {
+          $("#customer_id").val(data.id || "");
+          $("#code").val(data.code || "");
+          $("#name").val(data.name || "");
+          $("#address").val(data.address || "");
+          $("#mobile_number").val(data.mobile_number || "");
+          $("#mobile_number_2").val(data.mobile_number_2 || "");
+          $("#email").val(data.email || "");
+          $("#contact_person").val(data.contact_person || "");
+          $("#contact_person_number").val(data.contact_person_number || "");
+          $("#credit_limit").val(data.credit_limit || "");
+          $("#outstanding").val(data.outstanding || "");
+          $("#remark").val(data.remark || "");
+          $("#is_active").prop("checked", data.status == 1);
+
+          // Show update/hide create if present
+          $("#create").hide();
+          $("#update").show();
+        }
       }
 
       $("#supplierModal").modal("hide");
