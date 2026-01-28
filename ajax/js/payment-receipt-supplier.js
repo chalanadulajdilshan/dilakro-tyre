@@ -662,11 +662,17 @@ jQuery(document).ready(function ($) {
             const overdue = invoiceValue - paidAmount;
             totalOutstanding += overdue;
 
+            const arnNo = invoice.arn_no || "N/A";
+            const supplierInvoiceNo = invoice.bl_no || "N/A";
+
             $("#invoiceBody").append(`
               <tr>
                 <td>${invoice.invoice_date}</td>
                 <td class="hidden"><input type="hidden" name="invoice_id[]" value="${invoice.id}">${invoice.id}</td>
-                <td>${invoice.arn_no}</td>
+                <td>
+                  <div class="fw-semibold">${arnNo}</div>
+                  <div class="text-danger small">Invoice No: ${supplierInvoiceNo}</div>
+                </td>
                 <td>${formatAmount(invoiceValue)}</td>
                 <td>${formatAmount(paidAmount)}</td>
                 <td><span class="text-danger fw-bold invoice-overdue">${formatAmount(overdue)}</span></td>
