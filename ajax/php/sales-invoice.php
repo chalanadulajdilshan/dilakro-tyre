@@ -586,6 +586,32 @@ if (isset($_POST['action']) && $_POST['action'] == 'cancel') {
 
         $items = $SALES_INVOICE_ITEM->getItemsByInvoiceId($invoiceId);
 
+        // Handle DAG invoice cancellation - reset dag and dag_item records
+        if ($SALES_INVOICE->invoice_type == 'DAG' && !empty($SALES_INVOICE->ref_id)) {
+            $dagId = $SALES_INVOICE->ref_id;
+            
+            // Reset is_print to 0 in dag table
+            $DAG = new Dag($dagId);
+            if ($DAG->id) {
+                $DAG->is_print = 0;
+                $DAG->update();
+            }
+            
+            // Reset is_invoiced and total_amount for all invoiced dag_items of this dag
+            $DAG_ITEM_OBJ = new DagItem(null);
+            $dagItems = $DAG_ITEM_OBJ->getByDagId($dagId);
+            foreach ($dagItems as $dagItemRow) {
+                if ($dagItemRow['is_invoiced'] == 1) {
+                    $DAG_ITEM = new DagItem($dagItemRow['id']);
+                    if ($DAG_ITEM->id) {
+                        $DAG_ITEM->is_invoiced = 0;
+                        $DAG_ITEM->total_amount = 0;
+                        $DAG_ITEM->update();
+                    }
+                }
+            }
+        }
+
         $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
         $CUSTOMER_MASTER->updateCustomerOutstanding($SALES_INVOICE->customer_id, $SALES_INVOICE->grand_total, false);
 
