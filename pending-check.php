@@ -79,6 +79,17 @@ include 'auth.php';
                                                     <input type="text" class="form-control date-picker cashbook-date" id="date_to" name="date_to" autocomplete="off"  >
                                                 </div>
                                             </div>
+                                            <div class="me-2">
+                                                <label for="check_type" class="form-label">Type</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="uil uil-money-bill"></i></span>
+                                                    <select class="form-select" id="check_type" name="check_type">
+                                                        <option value="all">All</option>
+                                                        <option value="customer">Customer</option>
+                                                        <option value="supplier">Supplier</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <div class="d-flex flex-wrap align-items-end gap-2">
                                                 <button class="btn btn-primary" id="btn-filter">
                                                     <i class="uil uil-filter me-1"></i> Filter
@@ -110,6 +121,7 @@ include 'auth.php';
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
+                                                    <th>Type</th>
                                                     <th>Check No</th>
                                                     <th>Check Date</th>
                                                     <th>Bank</th>
