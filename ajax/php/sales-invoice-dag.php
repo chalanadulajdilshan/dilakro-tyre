@@ -140,6 +140,12 @@ if (isset($_POST['create'])) {
 
     // If invoice creation successful
     if ($invoice_id) {
+        // Update customer outstanding for credit invoices
+        if ($payment_type == '2') {
+            $CUSTOMER_MASTER = new CustomerMaster(NULL);
+            $CUSTOMER_MASTER->updateCustomerOutstanding($_POST['customer_id'], $grand_total, true);
+        }
+
         // Document tracking update
         $DOCUMENT_TRACKING = new DocumentTracking(null);
         if ($payment_type == '1') {
@@ -150,10 +156,22 @@ if (isset($_POST['create'])) {
             $DOCUMENT_TRACKING->incrementDocumentId('invoice');
         }
 
+        // Create invoice_payments record for cash invoices (for cashbook tracking)
+        if ($payment_type == '1') {
+            $INVOICE_PAYMENT = new InvoicePayment(NULL);
+            $INVOICE_PAYMENT->invoice_id = $invoice_id;
+            $INVOICE_PAYMENT->method_id = 1; // Cash payment method
+            $INVOICE_PAYMENT->amount = $grand_total;
+            $INVOICE_PAYMENT->reference_no = null;
+            $INVOICE_PAYMENT->bank_name = null;
+            $INVOICE_PAYMENT->cheque_date = null;
+            $INVOICE_PAYMENT->create();
+        }
+
         // Create invoice items for each DAG item
         foreach ($items as $item) {
             if (isset($item['is_dag']) && $item['is_dag']) {
-                            $SALES_INVOICE_ITEM = new SalesInvoiceItem(NULL);
+                $SALES_INVOICE_ITEM = new SalesInvoiceItem(NULL);
                 $SALES_INVOICE_ITEM->invoice_id = $invoice_id;
                 $SALES_INVOICE_ITEM->item_code = 'DAG-' . $item['dag_item_id'];
                 $SALES_INVOICE_ITEM->service_item_code = 'DAG-' . $_POST['dag_id'];
