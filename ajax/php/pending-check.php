@@ -6,11 +6,30 @@ header('Content-Type: application/json; charset=UTF-8');
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'filter') {
     $date    = isset($_POST['date']) ? trim($_POST['date']) : null;
     $date_to = isset($_POST['date_to']) ? trim($_POST['date_to']) : null;
+    $checkType = isset($_POST['check_type']) ? trim($_POST['check_type']) : 'all';
 
+    $customerChecks = [];
+    $supplierChecks = [];
 
+    if ($checkType === 'all' || $checkType === 'customer') {
+        $PAYMENT_RECEIPT = new PaymentReceiptMethod(null);
+        $customerChecks = $PAYMENT_RECEIPT->getByDateRange($date, $date_to);
+        foreach ($customerChecks as $key => $check) {
+            $customerChecks[$key]['type'] = 'Customer';
+        }
+    }
 
-$PAYMENT_REYMWNT_RECIPT = new PaymentReceiptMethod(null);
-$checks = $PAYMENT_REYMWNT_RECIPT->getByDateRange($date, $date_to);
+    if ($checkType === 'all' || $checkType === 'supplier') {
+        $PAYMENT_RECEIPT_SUPPLIER = new PaymentReceiptMethodSupplier(null);
+        $supplierChecks = $PAYMENT_RECEIPT_SUPPLIER->getByDateRange($date, $date_to);
+    }
+
+    $checks = array_merge($customerChecks, $supplierChecks);
+
+    // Sort checks by date (descending)
+    usort($checks, function($a, $b) {
+        return strtotime($b['cheq_date']) - strtotime($a['cheq_date']);
+    });
 
 
 
