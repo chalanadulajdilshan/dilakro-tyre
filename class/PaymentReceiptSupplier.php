@@ -104,5 +104,36 @@ class PaymentReceiptSupplier
 
         return $array;
     }
+
+    public function getFiltered($supplierId = null, $startDate = null, $endDate = null)
+    {
+        $query = "SELECT `id`, `receipt_no`, `customer_id`, `entry_date`, `amount_paid`, `remark`, `created_at`
+                  FROM `payment_receipt_supplier`
+                  WHERE 1=1";
+
+        if ($supplierId && $supplierId != '') {
+            $query .= " AND `customer_id` = '" . (int)$supplierId . "'";
+        }
+
+        if ($startDate && $startDate != '') {
+            $query .= " AND `entry_date` >= '" . mysqli_real_escape_string(Database::getInstance()->DB_CON, $startDate) . "'";
+        }
+
+        if ($endDate && $endDate != '') {
+            $query .= " AND `entry_date` <= '" . mysqli_real_escape_string(Database::getInstance()->DB_CON, $endDate) . "'";
+        }
+
+        $query .= " ORDER BY `entry_date` DESC, `id` DESC";
+
+        $db = Database::getInstance();
+        $result = $db->readQuery($query);
+        $array = [];
+
+        while ($row = mysqli_fetch_array($result)) {
+            array_push($array, $row);
+        }
+
+        return $array;
+    }
     
 }
