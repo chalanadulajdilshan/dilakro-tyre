@@ -305,7 +305,11 @@ include './auth.php';
                                         `;
 
                                         $('#modalContent').html(detailsHtml);
+                                    } else {
+                                        $('#modalContent').html('<div class="alert alert-warning">Payment not found</div>');
                                     }
+                                } else {
+                                    $('#modalContent').html('<div class="alert alert-danger">Failed to load payment details</div>');
                                 }
                             },
                             error: function() {
