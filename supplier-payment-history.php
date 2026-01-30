@@ -32,6 +32,38 @@ include './auth.php';
                                     <div class="card-body">
                                         <h4 class="card-title mb-4">Supplier Payment History</h4>
                                         
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label for="supplierFilter" class="form-label">Supplier</label>
+                                                <select id="supplierFilter" class="form-select">
+                                                    <option value="">All Suppliers</option>
+                                                    <?php
+                                                    $CUSTOMER = new CustomerMaster(null);
+                                                    $suppliers = $CUSTOMER->all();
+                                                    foreach ($suppliers as $supplier) {
+                                                        echo '<option value="' . $supplier['id'] . '">' . htmlspecialchars($supplier['code'] . ' - ' . $supplier['name']) . '</option>';
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="startDate" class="form-label">Start Date</label>
+                                                <input type="date" id="startDate" class="form-control">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="endDate" class="form-label">End Date</label>
+                                                <input type="date" id="endDate" class="form-control">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">&nbsp;</label>
+                                                <div>
+                                                    <button id="filterBtn" class="btn btn-primary w-100">
+                                                        <i class="uil uil-filter"></i> Apply Filter
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="table-responsive">
                                             <table id="paymentHistoryTable" class="table table-bordered dt-responsive nowrap"
                                                 style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -49,35 +81,7 @@ include './auth.php';
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    <?php
-                                                    $SUPPLIER_PAYMENT = new SupplierPaymentNew(null);
-                                                    $payments = $SUPPLIER_PAYMENT->all();
-                                                    
-                                                    foreach ($payments as $key => $payment) {
-                                                        $key++;
-                                                        $SUPPLIER = new CustomerMaster($payment['supplier_id']);
-                                                    ?>
-                                                        <tr>
-                                                            <td><?php echo $key; ?></td>
-                                                            <td><?php echo htmlspecialchars($payment['payment_no']); ?></td>
-                                                            <td><?php echo htmlspecialchars($SUPPLIER->code); ?></td>
-                                                            <td><?php echo htmlspecialchars($SUPPLIER->name); ?></td>
-                                                            <td><?php echo htmlspecialchars($payment['entry_date']); ?></td>
-                                                            <td class="text-end"><?php echo number_format($payment['cash_amount'], 2); ?></td>
-                                                            <td class="text-end"><?php echo number_format($payment['cheque_amount'], 2); ?></td>
-                                                            <td class="text-end fw-bold"><?php echo number_format($payment['total_amount'], 2); ?></td>
-                                                            <td><?php echo htmlspecialchars($payment['remark']); ?></td>
-                                                            <td>
-                                                                <button class="btn btn-sm btn-info view-details" 
-                                                                    data-id="<?php echo $payment['id']; ?>"
-                                                                    data-bs-toggle="modal" 
-                                                                    data-bs-target="#detailsModal">
-                                                                    <i class="uil uil-eye"></i> View
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    <?php } ?>
+                                                <tbody id="paymentTableBody">
                                                 </tbody>
                                             </table>
                                         </div>
@@ -117,9 +121,84 @@ include './auth.php';
 
             <script>
                 jQuery(document).ready(function ($) {
-                    $('#paymentHistoryTable').DataTable({
-                        order: [[0, 'desc']],
-                        pageLength: 50
+                    let dataTable;
+
+                    function loadPayments() {
+                        const supplierId = $('#supplierFilter').val();
+                        const startDate = $('#startDate').val();
+                        const endDate = $('#endDate').val();
+
+                        if (dataTable) {
+                            dataTable.destroy();
+                        }
+
+                        $('#paymentTableBody').html('<tr><td colspan="10" class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></td></tr>');
+
+                        $.ajax({
+                            url: 'ajax/php/supplier-payment-new.php',
+                            type: 'POST',
+                            data: {
+                                get_filtered_payments: true,
+                                supplier_id: supplierId,
+                                start_date: startDate,
+                                end_date: endDate
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    let html = '';
+                                    if (response.data.length > 0) {
+                                        response.data.forEach((payment, index) => {
+                                            html += `
+                                                <tr>
+                                                    <td>${index + 1}</td>
+                                                    <td>${payment.payment_no}</td>
+                                                    <td>${payment.supplier_code}</td>
+                                                    <td>${payment.supplier_name}</td>
+                                                    <td>${payment.entry_date}</td>
+                                                    <td class="text-end">${parseFloat(payment.cash_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                                    <td class="text-end">${parseFloat(payment.cheque_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                                    <td class="text-end fw-bold">${parseFloat(payment.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                                    <td>${payment.remark || ''}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-info view-details" 
+                                                            data-id="${payment.id}"
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#detailsModal">
+                                                            <i class="uil uil-eye"></i> View
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        });
+                                    } else {
+                                        html = '<tr><td colspan="10" class="text-center">No payments found</td></tr>';
+                                    }
+                                    $('#paymentTableBody').html(html);
+
+                                    dataTable = $('#paymentHistoryTable').DataTable({
+                                        order: [[0, 'desc']],
+                                        pageLength: 50
+                                    });
+                                } else {
+                                    $('#paymentTableBody').html('<tr><td colspan="10" class="text-center text-danger">Error loading payments</td></tr>');
+                                }
+                            },
+                            error: function() {
+                                $('#paymentTableBody').html('<tr><td colspan="10" class="text-center text-danger">Error loading payments</td></tr>');
+                            }
+                        });
+                    }
+
+                    loadPayments();
+
+                    $('#filterBtn').on('click', function() {
+                        loadPayments();
+                    });
+
+                    $('#supplierFilter, #startDate, #endDate').on('keypress', function(e) {
+                        if (e.which === 13) {
+                            loadPayments();
+                        }
                     });
 
                     $(document).on('click', '.view-details', function() {
