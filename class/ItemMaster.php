@@ -660,7 +660,8 @@ class ItemMaster
                  OR category_name LIKE '%$search%'";
         }
 
-        $query .= " ORDER BY im.name ASC";
+        // Use column name without table alias so it works when wrapped in a subquery for search filtering
+        $query .= " ORDER BY name ASC";
 
         $result = $db->readQuery($query);
         $items = [];
