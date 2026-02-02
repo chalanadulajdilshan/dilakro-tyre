@@ -17,7 +17,7 @@ class Database
 
             // Local DB
             $this->host = 'localhost';
-            $this->name = '360-ERP';
+            $this->name = 'dilakro';
             $this->user = 'root';
             $this->password = '';
 
