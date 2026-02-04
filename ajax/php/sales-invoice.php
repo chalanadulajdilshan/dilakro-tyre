@@ -177,11 +177,14 @@ if (isset($_POST['create'])) {
             $final_cost += $final_cost_item;
         } else if (substr($item['code'], 0, 2) === 'SI') {
             $SERVICE_ITEM = new ServiceItem($item['item_id']);
-            $service_cost = isset($item['cost']) ? (float)$item['cost'] : (float)$SERVICE_ITEM->cost;
-            $service_qty = !empty($item['service_qty']) ? $item['service_qty'] : $item['qty'];
+            $service_qty = !empty($item['service_qty']) ? (float)$item['service_qty'] : (float)$item['qty'];
 
-            // include service item cost in invoice costing
-            $final_cost_item = $service_cost * $service_qty;
+            // If cost was sent as a total for the service_qty, convert to unit cost
+            $raw_service_cost = isset($item['cost']) ? (float)$item['cost'] : (float)$SERVICE_ITEM->cost;
+            $service_cost_per_unit = $service_qty > 0 ? ($raw_service_cost / $service_qty) : (float)$SERVICE_ITEM->cost;
+
+            // include service item cost in invoice costing using unit cost
+            $final_cost_item = $service_cost_per_unit * $service_qty;
             $final_cost += $final_cost_item;
 
             $available_qty = $SERVICE_ITEM->qty - $service_qty;
@@ -341,9 +344,11 @@ if (isset($_POST['create'])) {
             $SALES_ITEM->price = $item['selling_price']; // Save the actual selling price (price after discount per unit)
 
             if (substr($item['code'], 0, 2) === 'SI') {
-                // Persist service item cost (not list price)
-                $service_cost = isset($item['cost']) ? (float)$item['cost'] : (float)(new ServiceItem($item['item_id']))->cost;
-                $SALES_ITEM->cost = $service_cost;
+                // Persist service item unit cost (avoid saving total cost again)
+                $service_qty = !empty($item['service_qty']) ? (float)$item['service_qty'] : (float)$item['qty'];
+                $raw_service_cost = isset($item['cost']) ? (float)$item['cost'] : (float)(new ServiceItem($item['item_id']))->cost;
+                $service_cost_per_unit = $service_qty > 0 ? ($raw_service_cost / $service_qty) : $raw_service_cost;
+                $SALES_ITEM->cost = $service_cost_per_unit;
             } else if (substr($item['code'], 0, 2) === 'SV') {
                 $SALES_ITEM->cost = 0;
             } else {
