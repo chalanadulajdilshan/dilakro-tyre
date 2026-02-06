@@ -242,8 +242,6 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                     <td colspan="5" style="padding-top:50px !important;">
                                         <table style="width:100%;">
                                             <tr>
-                                                <td style="text-align:center;">_________________________<br><strong>Prepared By</strong></td>
-                                                <td style="text-align:center;">_________________________<br><strong>Approved By</strong></td>
                                                 <td style="text-align:center;">_________________________<br><strong>Received By</strong></td>
                                             </tr>
                                         </table>
@@ -369,8 +367,6 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                                     <td colspan="8" style="padding-top:80px !important;">
                                         <table style="width:100%;">
                                             <tr>
-                                                <td style="text-align:center;">_________________________<br><strong>Prepared By</strong></td>
-                                                <td style="text-align:center;">_________________________<br><strong>Approved By</strong></td>
                                                 <td style="text-align:center;">_________________________<br><strong>Received By</strong></td>
                                             </tr>
                                         </table>
