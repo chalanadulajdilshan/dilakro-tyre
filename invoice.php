@@ -137,10 +137,23 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                         }
                         return $number;
                     }
+
+                    function oneLineAddress($address)
+                    {
+                        $address = trim($address);
+                        if ($address === '') {
+                            return '';
+                        }
+                        // Replace line breaks/tabs with a comma+space and collapse repeats
+                        $address = preg_replace('/[\r\n\t]+/', ', ', $address);
+                        $address = preg_replace('/\s{2,}/', ' ', $address);
+                        $address = preg_replace('/,\s*,+/', ', ', $address);
+                        return trim($address, ', ');
+                    }
                     ?>
                     <div class="col-md-5 text-muted">
                         <p class="mb-1" style="font-weight:bold;font-size:18px;"><?php echo $COMPANY_PROFILE->name ?></p>
-                        <p class="mb-1" style="font-size:13px;"><?php echo $COMPANY_PROFILE->address ?></p>
+                        <p class="mb-1" style="font-size:13px;"><?php echo oneLineAddress($COMPANY_PROFILE->address); ?></p>
                         <p class="mb-1" style="font-size:13px;"><?php echo $COMPANY_PROFILE->email ?> | <?php echo formatPhone($COMPANY_PROFILE->mobile_number_1); ?></p>
                     </div>
                     <div class="col-md-4 text-sm-start text-md-start">
@@ -148,7 +161,8 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                             <?php echo ($SALES_INVOICE->payment_type == 1) ? "CASH SALES INVOICE" : "CREDIT SALES INVOICE"; ?>
                         </h3>
                         <p class="mb-1 text-muted" style="font-size:14px;"><strong> Name:</strong> <?php echo $SALES_INVOICE->customer_name ?></p>
-                        <p class="mb-1 text-muted" style="font-size:14px;"><strong> Contact:</strong> <?php echo !empty($SALES_INVOICE->customer_address) ? $SALES_INVOICE->customer_address : '.................................' ?> - <?php echo !empty($SALES_INVOICE->customer_mobile) ? $SALES_INVOICE->customer_mobile : '.................................' ?></p>
+                        <p class="mb-1 text-muted" style="font-size:14px;"><strong> Address:</strong> <?php echo !empty($SALES_INVOICE->customer_address) ? oneLineAddress($SALES_INVOICE->customer_address) : '.................................' ?></p>
+                        <p class="mb-1 text-muted" style="font-size:14px;"><strong> Contact:</strong> <?php echo !empty($SALES_INVOICE->customer_mobile) ? formatPhone($SALES_INVOICE->customer_mobile) : '.................................' ?></p>
 
                     </div>
 
