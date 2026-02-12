@@ -19,7 +19,7 @@ class PaymentReceiptMethodSupplier
             $query = "SELECT `id`, `receipt_id`, `invoice_id`, `payment_type_id`, `amount`, 
                              `cheq_no`, `bank_id`, `branch_id`, `cheq_date`
                       FROM `payment_receipt_method_supplier`
-                      WHERE `id` = " . (int)$id;
+                      WHERE `id` = " . (int) $id;
 
             $db = Database::getInstance();
             $result = mysqli_fetch_array($db->readQuery($query));
@@ -108,7 +108,7 @@ class PaymentReceiptMethodSupplier
         $query = "SELECT `id`, `receipt_id`, `invoice_id`, `payment_type_id`, `amount`, 
                          `cheq_no`, `bank_id`, `branch_id`, `cheq_date`, `is_settle`
                   FROM `payment_receipt_method_supplier`
-                  WHERE `receipt_id` = '" . (int)$receiptId . "'
+                  WHERE `receipt_id` = '" . (int) $receiptId . "'
                   ORDER BY `id` ASC";
 
         $db = Database::getInstance();
@@ -121,7 +121,7 @@ class PaymentReceiptMethodSupplier
 
         return $array;
     }
-    
+
 
 
     public function updateIsSettle($id)
@@ -157,10 +157,14 @@ class PaymentReceiptMethodSupplier
                     prm.is_settle,
                     prm.cheq_date as entry_date,
                     b.name AS bank_name,
-                    br.name AS branch_name
+                    br.name AS branch_name,
+                    am.arn_no as invoice_no,
+                    cm.name as customer_name
                 FROM `payment_receipt_method_supplier` prm
                 LEFT JOIN `banks` b ON prm.bank_id = b.id
                 LEFT JOIN `branches` br ON prm.branch_id = br.id
+                LEFT JOIN `arn_master` am ON prm.invoice_id = am.id
+                LEFT JOIN `customer_master` cm ON am.supplier_id = cm.id
                 WHERE prm.payment_type_id = 2
                   AND prm.cheq_date BETWEEN '{$date}' AND '{$dateTo}'
                 ORDER BY prm.id ASC";
@@ -175,7 +179,7 @@ class PaymentReceiptMethodSupplier
             $row['bank_name'] = $BANK->name;
             $row['branch_name'] = $BRANCH->name;
             $row['type'] = 'Supplier';
-            
+
             $array[] = $row;
         }
 

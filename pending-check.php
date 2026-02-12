@@ -2,8 +2,8 @@
 <?php
 include 'class/include.php';
 include 'auth.php';
- 
- 
+
+
 ?>
 <html lang="en">
 
@@ -64,25 +64,30 @@ include 'auth.php';
                                 <div class="card-body">
                                     <div class="d-flex flex-wrap align-items-end gap-3">
                                         <div class="d-flex flex-wrap align-items-end gap-2">
-                                            
+
                                             <div class="me-2">
                                                 <label for="date" class="form-label">Date From</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text"><i class="uil uil-calendar-alt"></i></span>
-                                                    <input type="text" class="form-control date-picker cashbook-date" id="date" name="date" autocomplete="off" >
+                                                    <span class="input-group-text"><i
+                                                            class="uil uil-calendar-alt"></i></span>
+                                                    <input type="text" class="form-control date-picker cashbook-date"
+                                                        id="date" name="date" autocomplete="off">
                                                 </div>
                                             </div>
                                             <div class="me-2">
                                                 <label for="date_to" class="form-label">Date To</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text"><i class="uil uil-calendar-alt"></i></span>
-                                                    <input type="text" class="form-control date-picker cashbook-date" id="date_to" name="date_to" autocomplete="off"  >
+                                                    <span class="input-group-text"><i
+                                                            class="uil uil-calendar-alt"></i></span>
+                                                    <input type="text" class="form-control date-picker cashbook-date"
+                                                        id="date_to" name="date_to" autocomplete="off">
                                                 </div>
                                             </div>
                                             <div class="me-2">
                                                 <label for="check_type" class="form-label">Type</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text"><i class="uil uil-money-bill"></i></span>
+                                                    <span class="input-group-text"><i
+                                                            class="uil uil-money-bill"></i></span>
                                                     <select class="form-select" id="check_type" name="check_type">
                                                         <option value="all">All</option>
                                                         <option value="customer">Customer</option>
@@ -106,7 +111,7 @@ include 'auth.php';
                     </div>
 
 
-                    
+
 
                     <!-- Cashbook Transactions Table -->
                     <div class="row">
@@ -117,13 +122,15 @@ include 'auth.php';
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-hover" id="pending-check-table" style="width:100%">
+                                        <table class="table table-bordered table-hover" id="pending-check-table"
+                                            style="width:100%">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>Type</th>
-                                                    <th>Check No</th>
-                                                    <th>Check Date</th>
+                                                    <th>Customer Name</th>
+                                                    <th>Invoice No</th>
+                                                    <th>Cheque No</th>
+                                                    <th>Banking Date</th>
                                                     <th>Bank</th>
                                                     <th>Branch</th>
                                                     <th class="text-end">Amount</th>
@@ -134,8 +141,10 @@ include 'auth.php';
                                             </tbody>
                                             <tfoot>
                                                 <tr class="table-info">
-                                                    <td colspan="5" class="text-end"><strong>Total PD Check value:</strong></td>
-                                                    <td class="text-end"><strong id="total-pb-check-value">0.00</strong></td>
+                                                    <td colspan="7" class="text-end"><strong>Total PD Check
+                                                            value:</strong></td>
+                                                    <td class="text-end"><strong id="total-pb-check-value">0.00</strong>
+                                                    </td>
                                                 </tr>
                                             </tfoot>
                                         </table>
@@ -145,7 +154,7 @@ include 'auth.php';
                         </div>
                     </div>
 
-                     
+
 
                 </div>
             </div> <!-- container-fluid -->
@@ -158,7 +167,7 @@ include 'auth.php';
 
     </div>
     <!-- END layout-wrapper -->
- 
+
 
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
@@ -167,7 +176,7 @@ include 'auth.php';
     <script src="assets/libs/jquery/jquery.min.js"></script>
     <?php include 'main-js.php' ?>
     <script src="ajax/js/pending-check.js"></script>
- 
+
 </body>
 
 </html>

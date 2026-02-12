@@ -162,7 +162,8 @@ function updatePendingChecksTable(checks) {
 
             cashbookTable.row.add([
                 index + 1,
-                check.type || 'N/A',
+                check.customer_name || 'N/A',
+                check.invoice_no || 'N/A',
                 check.cheq_no || 'N/A',
                 check.cheq_date || 'N/A',
                 check.bank_name || 'N/A',
