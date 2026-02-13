@@ -19,7 +19,7 @@ class PaymentReceiptMethod
             $query = "SELECT `id`, `receipt_id`, `invoice_id`, `payment_type_id`, `amount`, 
                              `cheq_no`, `bank_id`, `branch_id`, `cheq_date`
                       FROM `payment_receipt_method`
-                      WHERE `id` = " . (int)$id;
+                      WHERE `id` = " . (int) $id;
 
             $db = Database::getInstance();
             $result = mysqli_fetch_array($db->readQuery($query));
@@ -39,11 +39,12 @@ class PaymentReceiptMethod
         }
     }
 
-    public function getByReceiptId($receipt_id) {
+    public function getByReceiptId($receipt_id)
+    {
         $query = "SELECT `id`, `receipt_id`, `invoice_id`, `payment_type_id`, `amount`, 
                         `cheq_no`, `bank_id`, `branch_id`, `cheq_date`, `is_settle`
                  FROM `payment_receipt_method` 
-                 WHERE `receipt_id` = " . (int)$receipt_id;
+                 WHERE `receipt_id` = " . (int) $receipt_id;
 
         $db = Database::getInstance();
         $result = $db->readQuery($query);
@@ -125,7 +126,7 @@ class PaymentReceiptMethod
         $query = "SELECT `id`, `receipt_id`, `invoice_id`, `payment_type_id`, `amount`, 
                          `cheq_no`, `bank_id`, `branch_id`, `cheq_date`, `is_settle`
                   FROM `payment_receipt_method`
-                  WHERE `receipt_id` = '" . (int)$receiptId . "'
+                  WHERE `receipt_id` = '" . (int) $receiptId . "'
                   ORDER BY `id` ASC";
 
         $db = Database::getInstance();
@@ -148,50 +149,53 @@ class PaymentReceiptMethod
         $db = Database::getInstance();
         return $db->readQuery($query);
     }
-      public function getByDateRange($date, $dateTo)
-{
-    if (empty($date) || empty($dateTo)) {
-        return [];
+    public function getByDateRange($date, $dateTo)
+    {
+        if (empty($date) || empty($dateTo)) {
+            return [];
+        }
+
+        $db = Database::getInstance();
+        $date = $db->escapeString($date);
+        $dateTo = $db->escapeString($dateTo);
+
+        $query = "SELECT 
+                    prm.id,
+                    prm.receipt_id,
+                    prm.invoice_id,
+                    prm.payment_type_id,
+                    prm.amount,
+                    prm.cheq_no,
+                    prm.bank_id,
+                    prm.branch_id,
+                    prm.cheq_date,
+                    prm.is_settle,
+                    prm.cheq_date as entry_date,
+                    b.name AS bank_name,
+                    br.name AS branch_name,
+                    si.invoice_no,
+                    si.customer_name
+                FROM `payment_receipt_method` prm
+                LEFT JOIN `banks` b ON prm.bank_id = b.id
+                LEFT JOIN `branches` br ON prm.branch_id = br.id
+                LEFT JOIN `sales_invoice` si ON prm.invoice_id = si.id
+                WHERE prm.payment_type_id = 2
+                  AND prm.cheq_date BETWEEN '{$date}' AND '{$dateTo}'
+                ORDER BY prm.id ASC";
+
+        $result = $db->readQuery($query);
+        $array = [];
+
+        while ($row = mysqli_fetch_array($result)) {
+
+            $BANK = new Bank($row['bank_id']);
+            $BRANCH = new Branch($row['branch_id']);
+            $row['bank_name'] = $BANK->name;
+            $row['branch_name'] = $BRANCH->name;
+
+            $array[] = $row;
+        }
+
+        return $array;
     }
-
-    $db = Database::getInstance();
-    $date = $db->escapeString($date);
-    $dateTo = $db->escapeString($dateTo);
-
-    $query = "SELECT 
-                prm.id,
-                prm.receipt_id,
-                prm.invoice_id,
-                prm.payment_type_id,
-                prm.amount,
-                prm.cheq_no,
-                prm.bank_id,
-                prm.branch_id,
-                prm.cheq_date,
-                prm.is_settle,
-                prm.cheq_date as entry_date,
-                b.name AS bank_name,
-                br.name AS branch_name
-            FROM `payment_receipt_method` prm
-            LEFT JOIN `banks` b ON prm.bank_id = b.id
-            LEFT JOIN `branches` br ON prm.branch_id = br.id
-            WHERE prm.payment_type_id = 2
-              AND prm.cheq_date BETWEEN '{$date}' AND '{$dateTo}'
-            ORDER BY prm.id ASC";
-
-    $result = $db->readQuery($query);
-    $array = [];
-
-    while ($row = mysqli_fetch_array($result)) {
-
-        $BANK = new Bank($row['bank_id']);
-        $BRANCH = new Branch($row['branch_id']);
-        $row['bank_name'] = $BANK->name;
-        $row['branch_name'] = $BRANCH->name;
-        
-        $array[] = $row;
-    }
-
-    return $array;
-}
 }
