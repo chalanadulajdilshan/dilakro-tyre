@@ -154,7 +154,7 @@ $CUSTOMER_MASTER = new CustomerMaster($SALES_INVOICE->customer_id);
                     <div class="col-md-5 text-muted">
                         <p class="mb-1" style="font-weight:bold;font-size:18px;"><?php echo $COMPANY_PROFILE->name ?></p>
                         <p class="mb-1" style="font-size:13px;"><?php echo oneLineAddress($COMPANY_PROFILE->address); ?></p>
-                        <p class="mb-1" style="font-size:13px;"><?php echo $COMPANY_PROFILE->email ?> | <?php echo formatPhone($COMPANY_PROFILE->mobile_number_1); ?></p>
+                        <p class="mb-1" style="font-size:13px;"><?php echo $COMPANY_PROFILE->email ?>  <?php echo formatPhone($COMPANY_PROFILE->mobile_number_1); ?></p>
                     </div>
                     <div class="col-md-4 text-sm-start text-md-start">
                         <h3 style="font-weight:bold;font-size:18px;">
