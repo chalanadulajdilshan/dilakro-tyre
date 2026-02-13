@@ -32,7 +32,7 @@ include_once(dirname(__FILE__) . '/Permission.php');
 include_once(dirname(__FILE__) . '/UserPermission.php');
 include_once(dirname(__FILE__) . '/MarketingExecutive.php');
 include_once(dirname(__FILE__) . '/Quotation.php');
-include_once(dirname(__FILE__) . '/QuotationItem.php');    
+include_once(dirname(__FILE__) . '/QuotationItem.php');
 include_once(dirname(__FILE__) . '/SizeMaster.php');
 include_once(dirname(__FILE__) . '/BeltMaster.php');
 include_once(dirname(__FILE__) . '/DesignMaster.php');
@@ -40,7 +40,7 @@ include_once(dirname(__FILE__) . '/StockTransaction.php');
 include_once(dirname(__FILE__) . '/StockAdjustmentType.php');
 include_once(dirname(__FILE__) . '/VehicleBrand.php');
 include_once(dirname(__FILE__) . '/VehicleModel.php');
-include_once(dirname(__FILE__) . '/InvoiceRemark.php');  
+include_once(dirname(__FILE__) . '/InvoiceRemark.php');
 include_once(dirname(__FILE__) . '/Bank.php');
 include_once(dirname(__FILE__) . '/EmployeeMaster.php');
 include_once(dirname(__FILE__) . '/ArnMaster.php');
@@ -79,6 +79,7 @@ include_once(dirname(__FILE__) . '/DailyIncome.php');
 include_once(dirname(__FILE__) . '/LocationMaster.php');
 include_once(dirname(__FILE__) . '/SupplierPaymentNew.php');
 include_once(dirname(__FILE__) . '/SupplierPaymentDetail.php');
+include_once(dirname(__FILE__) . '/CustomerComplaint.php');
 
 // Initialize session if not already started
 if (session_status() === PHP_SESSION_NONE) {
