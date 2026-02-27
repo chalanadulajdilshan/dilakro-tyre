@@ -318,16 +318,18 @@ class ItemMaster
 
         // Stock only filter - filter out items with 0 quantity in the specified department
         if ($stockOnly && $departmentId > 0) {
-            $join = " LEFT JOIN stock_master sm2 ON im.id = sm2.item_id AND sm2.department_id = $departmentId";
+            // Use ARN lots (stock_item_tmp) for quantity rather than stock_master
+            $join = " LEFT JOIN (SELECT item_id, SUM(qty) AS available_qty FROM stock_item_tmp WHERE department_id = $departmentId GROUP BY item_id) sm2 ON im.id = sm2.item_id";
             $having = " HAVING available_qty > 0";
         } elseif ($stockOnly) {
-            // If no department is specified but stock_only is true, filter out items with 0 total quantity
+            // If no department is specified but stock_only is true, filter out items with 0 total quantity (from ARN lots)
+            $join = " LEFT JOIN (SELECT item_id, SUM(qty) AS total_qty FROM stock_item_tmp GROUP BY item_id) sm2 ON im.id = sm2.item_id";
             $having = " HAVING total_qty > 0";
         }
 
         // Department filter
         if ($departmentId > 0 && !$stockOnly) {
-            $join = " LEFT JOIN stock_master sm2 ON im.id = sm2.item_id AND sm2.department_id = $departmentId";
+            $join = " LEFT JOIN (SELECT item_id, SUM(qty) AS available_qty FROM stock_item_tmp WHERE department_id = $departmentId GROUP BY item_id) sm2 ON im.id = sm2.item_id";
         }
 
         // Check if we're on the stock transfer page and need to show all departments
@@ -345,7 +347,7 @@ class ItemMaster
             $itemsSql = "
                 SELECT 
                     im.*, 
-                    IFNULL((SELECT SUM(quantity) FROM stock_master WHERE item_id = im.id), 0) as total_qty 
+                    IFNULL((SELECT SUM(qty) FROM stock_item_tmp WHERE item_id = im.id), 0) as total_qty 
                 FROM item_master im
                 $join
                 $where
@@ -371,8 +373,8 @@ class ItemMaster
             if (!empty($itemIds)) {
                 $idsStr = implode(',', array_map('intval', $itemIds));
                 $stockAggSql = "
-                    SELECT item_id, department_id, SUM(quantity) AS quantity
-                    FROM stock_master
+                    SELECT item_id, department_id, SUM(qty) AS quantity
+                    FROM stock_item_tmp
                     WHERE item_id IN ($idsStr)
                     GROUP BY item_id, department_id
                 ";
@@ -474,8 +476,8 @@ class ItemMaster
         SELECT 
             im.*, 
             " . ($departmentId > 0 ?
-            "IFNULL((SELECT SUM(sm.quantity) FROM stock_master sm WHERE sm.item_id = im.id AND sm.department_id = $departmentId), 0) as available_qty, " : "") . "
-            IFNULL((SELECT SUM(quantity) FROM stock_master WHERE item_id = im.id), 0) as total_qty 
+            "IFNULL((SELECT SUM(sm.qty) FROM stock_item_tmp sm WHERE sm.item_id = im.id AND sm.department_id = $departmentId), 0) as available_qty, " : "") . "
+            IFNULL((SELECT SUM(qty) FROM stock_item_tmp WHERE item_id = im.id), 0) as total_qty 
         FROM item_master im
         $join
         $where
@@ -503,7 +505,7 @@ class ItemMaster
 
             // Get department stock information (aggregate by department)
             $departmentStocks = [];
-            $stockQuery = "SELECT department_id, SUM(quantity) AS quantity FROM stock_master WHERE item_id = {$row['id']} GROUP BY department_id";
+            $stockQuery = "SELECT department_id, SUM(qty) AS quantity FROM stock_item_tmp WHERE item_id = {$row['id']} GROUP BY department_id";
             $stockResult = $db->readQuery($stockQuery);
             while ($stockRow = mysqli_fetch_assoc($stockResult)) {
                 $departmentStocks[] = [
