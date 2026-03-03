@@ -181,6 +181,7 @@ class PaymentReceiptMethod
                 LEFT JOIN `sales_invoice` si ON prm.invoice_id = si.id
                 WHERE prm.payment_type_id = 2
                   AND prm.cheq_date BETWEEN '{$date}' AND '{$dateTo}'
+                  AND prm.cheq_date >= CURDATE()
                 ORDER BY prm.id ASC";
 
         $result = $db->readQuery($query);

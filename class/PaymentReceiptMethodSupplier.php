@@ -158,7 +158,7 @@ class PaymentReceiptMethodSupplier
                     prm.cheq_date as entry_date,
                     b.name AS bank_name,
                     br.name AS branch_name,
-                    am.arn_no as invoice_no,
+                    COALESCE(NULLIF(am.bl_no, ''), NULLIF(am.pi_no, ''), am.arn_no) as invoice_no,
                     cm.name as customer_name
                 FROM `payment_receipt_method_supplier` prm
                 LEFT JOIN `banks` b ON prm.bank_id = b.id
@@ -167,6 +167,7 @@ class PaymentReceiptMethodSupplier
                 LEFT JOIN `customer_master` cm ON am.supplier_id = cm.id
                 WHERE prm.payment_type_id = 2
                   AND prm.cheq_date BETWEEN '{$date}' AND '{$dateTo}'
+                  AND prm.cheq_date >= CURDATE()
                 ORDER BY prm.id ASC";
 
         $result = $db->readQuery($query);
