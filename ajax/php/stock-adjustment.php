@@ -63,11 +63,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'create_stock_adjustment') {
         if ($item_id && $qty > 0) {
 
             $result = $STOCK_MASTER->adjustQuantity(
-                item_id: $item_id,
-                department_id: $department_id,
-                adjust_qty: $qty,
-                adjust_type: $adjustment_type,
-                remark: $special_instructions . ' - on ' . $adjustment_date
+                $item_id,
+                $department_id,
+                $qty,
+                $adjustment_type,
+                $special_instructions . ' - on ' . $adjustment_date
             );
 
 
