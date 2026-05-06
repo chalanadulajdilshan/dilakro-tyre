@@ -22,6 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($checkType === 'all' || $checkType === 'supplier') {
         $PAYMENT_RECEIPT_SUPPLIER = new PaymentReceiptMethodSupplier(null);
         $supplierChecks = $PAYMENT_RECEIPT_SUPPLIER->getByDateRange($date, $date_to);
+        foreach ($supplierChecks as $key => $check) {
+            $supplierChecks[$key]['type'] = 'Supplier';
+        }
     }
 
     $checks = array_merge($customerChecks, $supplierChecks);

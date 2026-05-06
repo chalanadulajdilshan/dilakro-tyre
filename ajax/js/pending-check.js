@@ -160,7 +160,7 @@ function updatePendingChecksTable(checks) {
         $.each(checks, function (index, check) {
             totalAmount += parseFloat(check.amount || 0);
 
-            cashbookTable.row.add([
+            var rowNode = cashbookTable.row.add([
                 index + 1,
                 check.customer_name || 'N/A',
                 check.invoice_no || 'N/A',
@@ -169,7 +169,13 @@ function updatePendingChecksTable(checks) {
                 check.bank_name || 'N/A',
                 check.branch_name || 'N/A',
                 '<div class="text-end">' + parseFloat(check.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</div>'
-            ]).draw(false);
+            ]).draw(false).node();
+
+            if (check.type === 'Customer') {
+                $(rowNode).addClass('row-customer');
+            } else if (check.type === 'Supplier') {
+                $(rowNode).addClass('row-supplier');
+            }
         });
     }
 

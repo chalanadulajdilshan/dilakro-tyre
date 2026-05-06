@@ -44,6 +44,16 @@ include 'auth.php';
         .transaction-out {
             color: #dc3545;
         }
+
+        #pending-check-table tr.row-customer > td {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        #pending-check-table tr.row-supplier > td {
+            background-color: #d1ecf1 !important;
+            color: #0c5460;
+        }
     </style>
 </head>
 
